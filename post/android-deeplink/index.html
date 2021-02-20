@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>README | Rodney Cheung&#39;s House</title>
+<title>Android deeplink | Rodney Cheung&#39;s House</title>
 <meta name="description" content="The king is noble only for practicing his way😄!">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -81,19 +81,88 @@
       <div class="sm-12 md-8 col">
         <div class="paper">
           <article class="article">
-            <h1>README</h1>
+            <h1>Android deeplink</h1>
             <p class="article-meta">
-              2021-02-18
+              2021-02-20
+              
+                <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
+                  Android
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge success">
+                  Kotlin
+                </a>
               
             </p>
             
             <div class="post-content">
-              <p>software developer,loler,crossfit,guitar player</p>
+              <p>deeplink用于将用户快速引导至对应应用的某个板块，在电商广告中使用较多，用户只需要点击广告变可以直接跳转到对应的电商APP的商品下单处，如果用户没有下载该应用，就跳转到下载页引导用户下载安装，完成新用户的转化。</p>
+<h2 id="一-具体实现">一、具体实现</h2>
+<p>在<code>Android</code>中实现<code>deeplink</code>非常简单，只需要在<code>AndroidManifest.xml</code>的<code>Activity</code>中添加以下代码即可：</p>
+<pre><code class="language-xml">&lt;intent-filter android:autoVerify=&quot;true&quot;&gt;
+  &lt;action android:name=&quot;android.intent.action.VIEW&quot; /&gt;
+
+  &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
+  &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot; /&gt;
+
+  &lt;data
+        android:scheme=&quot;http&quot;
+        android:host=&quot;medivh.top&quot;
+        android:path=&quot;/main&quot; /&gt;
+&lt;/intent-filter&gt;
+</code></pre>
+<p>此时，只需要在其他应用中使用<code>Intent(Intent.ACTION_VIEW, Uri.parse(&quot;http://medivh.top/main&quot;))</code>，并通过<code>startActivity</code>启动，即可跳转到具有以上声明的应用。</p>
+<p>除了<code>http</code>和<code>https</code>意外，还可以自定义URL的schema。</p>
+<pre><code class="language-xml">&lt;intent-filter android:label=&quot;@string/filter_test_medivh&quot;&gt;
+  &lt;action android:name=&quot;android.intent.action.VIEW&quot; /&gt;
+  &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
+  &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot; /&gt;
+  &lt;data android:scheme=&quot;medivh&quot;
+        android:host=&quot;test&quot; /&gt;
+&lt;/intent-filter&gt;
+</code></pre>
+<p>此时，使用<code>Intent(Intent.ACTION_VIEW, Uri.parse(&quot;medivh://test&quot;))</code>也可以完成应用跳转。</p>
+<p>为了跳转到预期的板块，可以在<code>Intent</code>中加入数据，<code>deeplink</code>的声明者对这些数据进行解析，完成板块的跳转。例如：</p>
+<pre><code class="language-kotlin">val jumpTpMedivhBtn: Button = findViewById(R.id.jump_to_medivh)
+jumpTpMedivhBtn.setOnClickListener {
+  val intent = Intent(Intent.ACTION_VIEW, Uri.parse(&quot;medivh://test&quot;))
+  intent.putExtra(&quot;device_info&quot;, false)
+  startActivity(intent)
+}
+</code></pre>
+<p>在A应用中发起了对B应用的跳转，并在<code>Intent</code>里面加入了一个表示是否跳转到B应用设备信息页的标识位数据。</p>
+<pre><code class="language-kotlin">val appLinkIntent = intent
+val devInfo = appLinkIntent.getBooleanExtra(&quot;device_info&quot;, true)
+if (!devInfo) {
+  Toast.makeText(this, &quot;navigate to slide show:${!devInfo}&quot;, Toast.LENGTH_SHORT).show()
+  navController.navigate(R.id.nav_slideshow)
+}
+</code></pre>
+<p>B应用在Activity的<code>onCreate</code>函数中解析收到的<code>Intent</code>，得知A应用不想跳转到默认的设备信息页面，于是使用<code>navController.navigate(R.id.nav_slideshow)</code>跳转到了其他页面。</p>
+<h2 id="二-处理顺序">二、处理顺序</h2>
+<p><code>Android</code>系统在处理<code>Uri</code>的Intent时遵循以下顺序：</p>
+<ol>
+<li>如果指定了用户的首选应用程序，则该应用程序可以处理URI。</li>
+<li>打开唯一可以处理URI的应用程序。</li>
+<li>允许用户从对话框中选择一个应用程序。</li>
+</ol>
+<p>所以，如果使用<code>http</code>或者<code>https</code>作为链接的schema，那么如果没有应用处理该Intent，<code>Android</code>系统则会调用默认浏览器来进行处理。此时，开发者就可以在这里将链接重定向到app下载地址，引导用户进行下载了。</p>
 
             </div>
           </article>
         </div>
         <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/best-practice-of-pythons-project-structure/">
+                <h3 class="post-title">
+                  Best practice of Python&#39;s project structure
+                </h3>
+              </a>
+            </div>
           
         </div>
         
@@ -171,7 +240,7 @@
     </div>
     <div class="row">
       
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge success">
           Android
         </a>
       
