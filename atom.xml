@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://jsrdzhk.github.io</id>
     <title>Rodney Cheung&apos;s House</title>
-    <updated>2021-02-20T09:53:22.959Z</updated>
+    <updated>2021-03-02T03:19:11.595Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://jsrdzhk.github.io"/>
     <link rel="self" href="https://jsrdzhk.github.io/atom.xml"/>
@@ -10,6 +10,44 @@
     <logo>https://jsrdzhk.github.io/images/avatar.png</logo>
     <icon>https://jsrdzhk.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Rodney Cheung&apos;s House</rights>
+    <entry>
+        <title type="html"><![CDATA[Git服务器添加SSH Key]]></title>
+        <id>https://jsrdzhk.github.io/post/git-fu-wu-qi-tian-jia-ssh-key/</id>
+        <link href="https://jsrdzhk.github.io/post/git-fu-wu-qi-tian-jia-ssh-key/">
+        </link>
+        <updated>2021-03-02T03:17:40.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="一-检查本机是否存在ssh-key">一、检查本机是否存在SSH key</h2>
+<p>输入以下命令：</p>
+<pre><code class="language-sh">ls -al ~/.ssh
+</code></pre>
+<p>如果没有类似<code>id_rsa.pub</code>、<code>id_ecdsa.pub</code>和<code>id_ed25519.pub</code>这样的文件，说明就需要生成新的SSH key。</p>
+<h2 id="二-生成ssh-key">二、生成SSH key</h2>
+<ol>
+<li><code>ssh-keygen -t rsa -b 4096 -C &quot;your_email@example.com&quot;</code></li>
+<li>接着会提示输入key保存位置和输入安全密码短语，直接回车使用默认值即可</li>
+</ol>
+<h2 id="三-启动ssh-agent">三、启动ssh-agent</h2>
+<ol>
+<li><code>eval &quot;$(ssh-agent -s)&quot;</code></li>
+<li>将生成的密钥加入到ssh中:<code>ssh-add ~/.ssh/id_rsa</code></li>
+</ol>
+<h2 id="四-将ssh-key添加到github">四、将SSH key添加到github</h2>
+<ol>
+<li>输出SSH key内容并拷贝<pre><code class="language-shell">cat ~/.ssh/id_rsa.pub
+</code></pre>
+</li>
+<li>粘贴到github账户的<code>Setting-&gt;SSH and GPG keys-&gt;New SSH key</code>中。</li>
+</ol>
+<h2 id="五-troubleshooting">五、troubleshooting</h2>
+<ol>
+<li><code>Unable to negotiate with xxx.xxx.xxx.xxx port 22: no matching key exchange method found. Their offer: diffie-hellman-group1-sha1</code><br>
+在~/.ssh/config中加入以下内容:<pre><code>Host *
+    KexAlgorithms +diffie-hellman-group1-sha1
+</code></pre>
+</li>
+</ol>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[简单的线程池实现]]></title>
         <id>https://jsrdzhk.github.io/post/jian-dan-de-xian-cheng-chi-shi-xian/</id>
