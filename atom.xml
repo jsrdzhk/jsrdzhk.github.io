@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://jsrdzhk.github.io</id>
     <title>Rodney Cheung&apos;s House</title>
-    <updated>2021-06-29T08:09:08.017Z</updated>
+    <updated>2021-06-29T08:10:30.248Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://jsrdzhk.github.io"/>
     <link rel="self" href="https://jsrdzhk.github.io/atom.xml"/>
@@ -16,8 +16,7 @@
         <link href="https://jsrdzhk.github.io/post/android-appxi-tong-qian-ming/">
         </link>
         <updated>2021-06-29T08:07:52.000Z</updated>
-        <content type="html"><![CDATA[<h1 id="android-app系统签名"><code>Android app</code>系统签名</h1>
-<p>在调试应用时，如果需要申请系统权限，例如<code>android.permission.DUMP</code>，则需要将应用设置为系统权限。</p>
+        <content type="html"><![CDATA[<p>在调试应用时，如果需要申请系统权限，例如<code>android.permission.DUMP</code>，则需要将应用设置为系统权限。</p>
 <h2 id="一-android-app权限等级">一、<code>Android app</code>权限等级</h2>
 <p><code>SEAndroid</code>将Android应用按权限等级由低到高分为以下权限等级：</p>
 <table>
