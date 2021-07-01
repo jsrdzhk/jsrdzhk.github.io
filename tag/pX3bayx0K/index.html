@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Git服务器添加SSH Key | Rodney Cheung&#39;s House</title>
+<title>proxy | Rodney Cheung&#39;s House</title>
 <meta name="description" content="The king is noble only for practicing his way😄!">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,7 +23,6 @@
 
   </head>
   <body>
-  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House</a></h3>
@@ -80,69 +79,40 @@
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
-          <article class="article">
-            <h1>Git服务器添加SSH Key</h1>
-            <p class="article-meta">
-              2021-03-02
-              
-                <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge secondary">
-                  Git
-                </a>
-              
-            </p>
-            
-            <div class="post-content">
-              <h2 id="一-检查本机是否存在ssh-key">一、检查本机是否存在SSH key</h2>
-<p>输入以下命令：</p>
-<pre><code class="language-sh">ls -al ~/.ssh
-</code></pre>
-<p>如果没有类似<code>id_rsa.pub</code>、<code>id_ecdsa.pub</code>和<code>id_ed25519.pub</code>这样的文件，说明就需要生成新的SSH key。</p>
-<h2 id="二-生成ssh-key">二、生成SSH key</h2>
-<ol>
-<li><code>ssh-keygen -t rsa -b 4096 -C &quot;your_email@example.com&quot;</code></li>
-<li>接着会提示输入key保存位置和输入安全密码短语，直接回车使用默认值即可</li>
-</ol>
-<h2 id="三-启动ssh-agent">三、启动ssh-agent</h2>
-<ol>
-<li><code>eval &quot;$(ssh-agent -s)&quot;</code></li>
-<li>将生成的密钥加入到ssh中:<code>ssh-add ~/.ssh/id_rsa</code></li>
-</ol>
-<h2 id="四-将ssh-key添加到github">四、将SSH key添加到github</h2>
-<ol>
-<li>输出SSH key内容并拷贝<pre><code class="language-shell">cat ~/.ssh/id_rsa.pub
-</code></pre>
-</li>
-<li>粘贴到github账户的<code>Setting-&gt;SSH and GPG keys-&gt;New SSH key</code>中。</li>
-</ol>
-<h2 id="五-troubleshooting">五、troubleshooting</h2>
-<ol>
-<li><code>Unable to negotiate with xxx.xxx.xxx.xxx port 22: no matching key exchange method found. Their offer: diffie-hellman-group1-sha1</code><br>
-在~/.ssh/config中加入以下内容:<pre><code>Host *
-    KexAlgorithms +diffie-hellman-group1-sha1
-</code></pre>
-</li>
-</ol>
+          <h2 class="current-tag">标签: proxy</h2>
+          
+  <article class="article">
+    <h2 class="article-title">
+      <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/">terminal如何走代理</a>
+    </h2>
+    <p class="article-meta">
+      2021-07-01
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge success">
+          proxy
+        </a>
+      
+    </p>
+    <p class="text-lead">
+      
+    </p>
+    <div class="row">
+      <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/" class="readmore-link">
+        <button>
+          Read More
+        </button>
+      </a>
+    </div>
+  </article>
 
-            </div>
-          </article>
+
         </div>
-        <div class="paper" data-aos="fade-in">
-          
-            <div class="next-post">
-              <div class="next">
-                Next Blog
-              </div>
-              <a href="https://jsrdzhk.github.io/post/jian-dan-de-xian-cheng-chi-shi-xian/">
-                <h3 class="post-title">
-                  简单的线程池实现
-                </h3>
-              </a>
-            </div>
-          
-        </div>
-        
+        <div class="row flex-edges">
+  
+  
+</div>
+
       </div>
-
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://jsrdzhk.github.io/images/avatar.png?v=1625134751392" class="no-responsive avatar">
@@ -239,27 +209,27 @@
     </div>
     <div class="row">
       
-        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge secondary">
           proxy
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge ">
           Android
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
           Git
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
           cpp
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge secondary">
           Kotlin
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
           Python
         </a>
       
@@ -269,7 +239,6 @@
     Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
   </div>
 </div>
-
 
     </div>
 
