@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Python | Rodney Cheung&#39;s House</title>
+<title>terminal如何走代理 | Rodney Cheung&#39;s House</title>
 <meta name="description" content="The king is noble only for practicing his way😄!">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,6 +23,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House</a></h3>
@@ -79,40 +80,84 @@
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
-          <h2 class="current-tag">标签: Python</h2>
-          
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://jsrdzhk.github.io/post/best-practice-of-pythons-project-structure/">Best practice of Python&#39;s project structure</a>
-    </h2>
-    <p class="article-meta">
-      2021-02-19
-      
-        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge warning">
-          Python
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://jsrdzhk.github.io/post/best-practice-of-pythons-project-structure/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
+          <article class="article">
+            <h1>terminal如何走代理</h1>
+            <p class="article-meta">
+              2021-07-01
+              
+            </p>
+            
+            <div class="post-content">
+              <p>在<code>shell</code>的配置文件中添加一些简单脚本即可实现终端走代理。</p>
+<h2 id="一-http代理">一、http代理</h2>
+<pre><code class="language-sh">#proxy
+HTTP='127.0.0.1:7890'
+defp=$HTTP
 
+# No Proxy
+function noproxy
+{
+    unset http_proxy HTTP_PROXY https_proxy HTTPS_PROXY all_proxy ALL_PROXY ftp_proxy FTP_PROXY dns_proxy DNS_PROXY JAVA_OPTS GRADLE_OPTS MAVEN_OPTS
+    echo &quot;clear proxy done&quot;
+}
 
+function setproxy
+{
+	if [ $# -eq 0 ]
+	then
+		inArg=$defp
+	else
+		inArg=$1
+	fi
+	HOST=$(echo $inArg |cut -d: -f1)
+	PORT=$(echo $inArg |cut -d: -f2)
+	http_proxy=http://$HOST:$PORT
+	HTTP_PROXY=$http_proxy
+	all_proxy=$http_proxy
+	ALL_PROXY=$http_proxy
+	ftp_proxy=$http_proxy
+	FTP_PROXY=$http_proxy
+	dns_proxy=$http_proxy
+	DNS_PROXY=$http_proxy
+	https_proxy=$http_proxy
+	HTTPS_PROXY=$https_proxy
+	JAVA_OPTS=&quot;-Dhttp.proxyHost=$HOST -Dhttp.proxyPort=$PORT -Dhttps.proxyHost=$HOST -Dhttps.proxyPort=$PORT&quot;
+	GRADLE_OPTS=&quot;-Dgradle.user.home=$HOME/.gradle&quot;
+	MAVEN_OPTS=$JAVA_OPTS
+	no_proxy=&quot;localhost,127.0.0.1,localaddress,.localdomain.com,.huaweicloud.com,.coding.net,.ruby-china.org&quot;
+	echo &quot;current proxy is ${http_proxy}&quot;
+	export no_proxy http_proxy HTTP_PROXY https_proxy HTTPS_PROXY all_proxy ALL_PROXY ftp_proxy FTP_PROXY dns_proxy DNS_PROXY JAVA_OPTS GRADLE_OPTS MAVEN_OPTS
+}
+</code></pre>
+<p>这段代码添加了两个函数，<code>setproxy</code>将<code>http_proxy</code>设置为想要的代理地址，<code>noproxy</code>则去除代理设置。<code>setproxy</code>函数默认代理<code>127.0.0.1:7890</code>，这是<code>Clash</code>默认的http代理。如果想要终端打开默认开始代理，在最后加上一行<code>setproxy</code>即可。</p>
+<h2 id="二-socks5代理">二、socks5代理</h2>
+<p>在配置文件中添加新的函数<code>setsocks5</code>,代码如下：</p>
+<pre><code class="language-sh">function setsocks5
+{
+	export ALL_PROXY=socks5://127.0.0.1:1080
+}
+</code></pre>
+
+            </div>
+          </article>
         </div>
-        <div class="row flex-edges">
-  
-  
-</div>
-
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/android-appxi-tong-qian-ming/">
+                <h3 class="post-title">
+                  Android app系统签名
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
       </div>
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://jsrdzhk.github.io/images/avatar.png?v=1625134594390" class="no-responsive avatar">
@@ -209,15 +254,15 @@
     </div>
     <div class="row">
       
-        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
           Git
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
           cpp
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge success">
           Android
         </a>
       
@@ -225,7 +270,7 @@
           Kotlin
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge success">
           Python
         </a>
       
@@ -235,6 +280,7 @@
     Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
   </div>
 </div>
+
 
     </div>
 
