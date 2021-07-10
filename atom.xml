@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://jsrdzhk.github.io</id>
     <title>Rodney Cheung&apos;s House</title>
-    <updated>2021-07-01T10:19:15.502Z</updated>
+    <updated>2021-07-10T01:31:31.311Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://jsrdzhk.github.io"/>
     <link rel="self" href="https://jsrdzhk.github.io/atom.xml"/>
@@ -10,6 +10,350 @@
     <logo>https://jsrdzhk.github.io/images/avatar.png</logo>
     <icon>https://jsrdzhk.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Rodney Cheung&apos;s House</rights>
+    <entry>
+        <title type="html"><![CDATA[二叉树的遍历]]></title>
+        <id>https://jsrdzhk.github.io/post/er-cha-shu-de-bian-li/</id>
+        <link href="https://jsrdzhk.github.io/post/er-cha-shu-de-bian-li/">
+        </link>
+        <updated>2021-07-10T01:28:54.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="一-定义">一、定义</h2>
+<pre><code class="language-c++">struct TreeNode {
+     int val;
+     TreeNode *left;
+     TreeNode *right;
+     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+</code></pre>
+<h2 id="二-二叉树的遍历">二、二叉树的遍历</h2>
+<h3 id="21-前序遍历">2.1 前序遍历</h3>
+<p>前序遍历（<strong>Pre-Order Traversal</strong>）的访问顺序为：</p>
+<pre><code>根节点-&gt;左子树-&gt;右子树
+</code></pre>
+<h4 id="211-递归写法">2.1.1 递归写法</h4>
+<pre><code class="language-c++">void recursivePreorderTraverseImpl(TreeNode *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    res.push_back(node-&gt;val);
+    recursivePreorderTraverseImpl(node-&gt;left, res);
+    recursivePreorderTraverseImpl(node-&gt;right, res);
+}
+
+std::vector&lt;int&gt; recursivePreorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    recursivePreorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="212-迭代写法">2.1.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationPreorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;TreeNode *&gt; nodeStack;
+    nodeStack.push(root);
+    while (!nodeStack.empty()) {
+        TreeNode *node = nodeStack.top();
+        res.push_back(node-&gt;val);
+        nodeStack.pop();
+        if (node-&gt;right) {
+            nodeStack.push(node-&gt;right);
+        }
+        if (node-&gt;left) {
+            nodeStack.push(node-&gt;left);
+        }
+    }
+    return res;
+}
+</code></pre>
+<p>当使用迭代遍历二叉树时，使用以下步骤：</p>
+<ol>
+<li>首先将根节点<code>push</code>栈中</li>
+<li>读取栈顶的值，并将右子节点和左子节点<code>push</code>到栈中，因为栈是先入后出，所以需要最后将左子节点<code>push</code>进去</li>
+<li>重复1、2步读取栈顶节点</li>
+</ol>
+<h3 id="22-中序遍历">2.2 中序遍历</h3>
+<p>中序遍历（<strong>In-Order Traversal</strong>）的访问顺序为：</p>
+<pre><code>左子树-&gt;根节点-&gt;右子树
+</code></pre>
+<h4 id="221-递归写法">2.2.1 递归写法</h4>
+<pre><code class="language-c++">void recursiveInorderTraverseImpl(TreeNode *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    recursiveInorderTraverseImpl(node-&gt;left, res);
+    res.push_back(node-&gt;val);
+    recursiveInorderTraverseImpl(node-&gt;right, res);
+}
+
+std::vector&lt;int&gt; recursiveInorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    recursiveInorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="222-迭代写法">2.2.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationInorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    std::stack&lt;TreeNode *&gt; nodeStack;
+    while (root || !nodeStack.empty()) {
+        while (root) {
+            nodeStack.push(root);
+            root = root-&gt;left;
+        }
+        root = nodeStack.top();
+        nodeStack.pop();
+        res.push_back(root-&gt;val);
+        root = root-&gt;right;
+    }
+    return res;
+}
+</code></pre>
+<p>这里的思路就是模拟递归的遍历过程，关键在于使用<code>std::stack</code>来模拟函数调用栈：</p>
+<ol>
+<li>将根节点及其左子节点都<code>push</code>到栈中</li>
+<li>当左右根节点及其左子节点都进入栈中后，将栈顶的节点弹出，由于该节点已经没有左子树，所以首先将它的值放到结果集中，然后将根节点设为该节点的右子节点</li>
+<li>重复1、2步直至栈空。</li>
+</ol>
+<h3 id="23-后序遍历">2.3 后序遍历</h3>
+<p>中序遍历（<strong>Post-Order Traversal</strong>）的访问顺序为：</p>
+<pre><code>左子树-&gt;右子树-&gt;根节点
+</code></pre>
+<h4 id="231-递归写法">2.3.1 递归写法</h4>
+<pre><code class="language-c++">void recursivePostorderTraverseImpl(TreeNode *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    recursivePostorderTraverseImpl(node-&gt;left, res);
+    recursivePostorderTraverseImpl(node-&gt;right, res);
+    res.push_back(node-&gt;val);
+}
+
+std::vector&lt;int&gt; recursivePostorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    recursivePostorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="232-迭代写法">2.3.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationPostorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;TreeNode *&gt; nodeStack;
+    nodeStack.push(root);
+    while (!nodeStack.empty()) {
+        TreeNode *node = nodeStack.top();
+        nodeStack.pop();
+        res.push_back(node-&gt;val);
+        if (node-&gt;left) {
+            nodeStack.push(node-&gt;left);
+        }
+        if (node-&gt;right) {
+            nodeStack.push(node-&gt;right);
+        }
+    }
+    std::reverse(res.begin(), res.end());
+    return res;
+}
+</code></pre>
+<p>类似于前序遍历的迭代写法，当我们调换push到栈中的左右子树顺序，那么结果就是：</p>
+<pre><code>[根节点] [右子树] [左子树]
+</code></pre>
+<p>将结果倒序，就成为了：</p>
+<pre><code>[左子树] [右子树] [根节点]
+</code></pre>
+<h3 id="24-层序遍历">2.4 层序遍历</h3>
+<p>层序遍历按照树的层次依次遍历树的节点。</p>
+<h4 id="241-利用队列">2.4.1 利用队列</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; levelorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::queue&lt;TreeNode *&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        TreeNode *node = q.front();
+        res.push_back(node-&gt;val);
+        if (node-&gt;left) {
+            q.push(node-&gt;left);
+        }
+        if (node-&gt;right) {
+            q.push(node-&gt;right);
+        }
+        q.pop();
+    }
+    return res;
+}
+</code></pre>
+<p>这里借助队列完成层序遍历：</p>
+<ol>
+<li>将根节点<code>push</code>到队列中</li>
+<li>读取队列头部的节点内容，然后将该节点的左子节点和右子节点<code>push</code>到队列中</li>
+<li>将队列头部节点弹出队列</li>
+<li>重复2、3步直至队列为空</li>
+</ol>
+<h4 id="242-将结果按层输出">2.4.2 将结果按层输出</h4>
+<p>上一节将所有结果都放到一个动态数组中，如果需要将结果分层放入到不同的动态数组中，则需要稍微改动一点代码。实际上，刚刚每次读取头部节点并将左子节点和右子节点<code>push</code>到队列中的操作，就是将下一层的节点放到队列末尾，等待该层所有节点遍历完毕，才回去遍历下一层的节点。</p>
+<p>所以，这里使用一个辅助的队列，用于存放下一层的所有节点。当该层节点都遍历完成后，在遍历辅助队列中的下一层节点。</p>
+<pre><code class="language-c++">std::vector&lt;std::vector&lt;int&gt;&gt; levelorderTraverse2(TreeNode *root) {
+    std::vector&lt;std::vector&lt;int&gt;&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::queue&lt;TreeNode *&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        std::queue&lt;TreeNode *&gt; tmp;
+        std::vector&lt;int&gt; line;
+        while (!q.empty()) {
+            TreeNode *node = q.front();
+            q.pop();
+            line.push_back(node-&gt;val);
+            if (node-&gt;left) {
+                tmp.push(node-&gt;left);
+            }
+            if (node-&gt;right) {
+                tmp.push(node-&gt;right);
+            }
+        }
+        res.push_back(line);
+        q = tmp;
+    }
+    return res;
+}
+</code></pre>
+<h2 id="三-n叉树的遍历">三、n叉树的遍历</h2>
+<p>n叉树的定义类似于二叉树，n叉树拥有不定数量的子节点，它的遍历相较于二叉树，没有本质区别，下面仅给出代码。</p>
+<pre><code class="language-c++">class Node {
+   public:
+    int val;
+    std::vector&lt;Node *&gt; children;
+    Node() {}
+    Node(int _val) { val = _val; }
+    Node(int _val, std::vector&lt;Node *&gt; _children) {
+        val = _val;
+        children = _children;
+    }
+};
+</code></pre>
+<h3 id="31-前序遍历">3.1 前序遍历</h3>
+<p><a href="https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/">589. N 叉树的前序遍历 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h4 id="311-递归写法">3.1.1 递归写法</h4>
+<pre><code class="language-c++">void recursiveNArrPreorderTraverseImpl(Node *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    res.push_back(node-&gt;val);
+    for (auto c : node-&gt;children) {
+        recursiveNArrPreorderTraverseImpl(c, res);
+    }
+}
+
+std::vector&lt;int&gt; recursiveNArrPreorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    recursiveNArrPreorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="312-迭代写法">3.1.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationNArrPreorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;Node *&gt; s;
+    s.push(root);
+    while (!s.empty()) {
+        Node *node = s.top();
+        s.pop();
+        res.push_back(node-&gt;val);
+        auto &amp;c = node-&gt;children;
+        for (auto rb = c.rbegin(); rb != c.rend(); ++rb) {
+            if (*rb) {
+                s.push(*rb);
+            }
+        }
+    }
+    return res;
+}
+</code></pre>
+<h3 id="32-后序遍历">3.2 后序遍历</h3>
+<p><a href="https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/">590. N 叉树的后序遍历 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h4 id="321-递归写法">3.2.1 递归写法</h4>
+<pre><code class="language-c++">void recursiveNArrPostorderTraverseImpl(Node *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    for (auto c : node-&gt;children) {
+        recursiveNArrPostorderTraverseImpl(c, res);
+    }
+    res.push_back(node-&gt;val);
+}
+
+std::vector&lt;int&gt; recursiveNArrPostorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    recursiveNArrPostorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="322-迭代写法">3.2.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationNArrPostorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;Node *&gt; s;
+    s.push(root);
+    while (!s.empty()) {
+        Node *node = s.top();
+        s.pop();
+        res.push_back(node-&gt;val);
+        auto &amp;c = node-&gt;children;
+        for (auto pc : c) {
+            s.push(pc);
+        }
+    }
+    std::reverse(res.begin(), res.end());
+    return res;
+}
+</code></pre>
+<h3 id="33-层序遍历">3.3 层序遍历</h3>
+<p><a href="https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/">429. N 叉树的层序遍历 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<pre><code class="language-c++">std::vector&lt;std::vector&lt;int&gt;&gt; nArrLevelorderTraverse(Node *root) {
+    std::vector&lt;std::vector&lt;int&gt;&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::queue&lt;Node *&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        std::vector&lt;int&gt; line;
+        std::queue&lt;Node *&gt; tmp;
+        while (!q.empty()) {
+            Node *n = q.front();
+            q.pop();
+            line.push_back(n-&gt;val);
+            auto &amp;c = n-&gt;children;
+            for (auto pc : c) {
+                if (pc) {
+                    tmp.push(pc);
+                }
+            }
+        }
+        res.push_back(line);
+        q = tmp;
+    }
+    return res;
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[terminal如何走代理]]></title>
         <id>https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/</id>
