@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://jsrdzhk.github.io</id>
     <title>Rodney Cheung&apos;s House</title>
-    <updated>2021-07-11T01:59:35.039Z</updated>
+    <updated>2021-07-11T02:10:37.596Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://jsrdzhk.github.io"/>
     <link rel="self" href="https://jsrdzhk.github.io/atom.xml"/>
@@ -10,6 +10,133 @@
     <logo>https://jsrdzhk.github.io/images/avatar.png</logo>
     <icon>https://jsrdzhk.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Rodney Cheung&apos;s House</rights>
+    <entry>
+        <title type="html"><![CDATA[Docker镜像导入导出]]></title>
+        <id>https://jsrdzhk.github.io/post/docker-image-import-and-export/</id>
+        <link href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">
+        </link>
+        <updated>2021-07-11T02:06:44.000Z</updated>
+        <content type="html"><![CDATA[<p>在缺乏网络的环境中，可以将<code>Docker</code>镜像导出，进行离线部署。</p>
+<h2 id="一-save-load">一、save &amp;&amp; load</h2>
+<p><code>docker save</code>命令可以将多个镜像导出到文件中，用法如下:</p>
+<pre><code class="language-sh">&gt;docker save --help
+
+Usage:  docker save [OPTIONS] IMAGE [IMAGE...]
+
+Save one or more images to a tar archive (streamed to STDOUT by default)
+
+Options:
+      --help            Print usage
+  -o, --output string   Write to a file, instead of STDOUT
+</code></pre>
+<p>例如：</p>
+<pre><code class="language-sh">docker save -o wq_ci.tar postgres:10 jenkins/jenkins:lts sonarqube:lts
+</code></pre>
+<p>在导出完成后，可以使用<code>docker load -i &lt;saved_image.tar&gt;</code>来加载导出的<code>image</code>。</p>
+<h2 id="二-export-import">二、export &amp;&amp; import</h2>
+<p><code>docker export</code>可以将<code>container</code>导出，用法如下:</p>
+<pre><code class="language-sh">&gt;docker export --help
+
+Usage:  docker export [OPTIONS] CONTAINER
+
+Export a container's filesystem as a tar archive
+
+Options:
+      --help            Print usage
+  -o, --output string   Write to a file, instead of STDOUT
+</code></pre>
+<p>例如：</p>
+<pre><code class="language-sh">docker export -o postgres-export.tar postgres
+</code></pre>
+<p>使用<code>docker import</code>可以从导出文件生成<code>image</code>，例如：</p>
+<pre><code class="language-sh">docker import postgres-export.tar postgres:latest
+</code></pre>
+<h2 id="三-save和export区别">三、save和export区别</h2>
+<ol>
+<li><code>docker save</code>保存的是<code>image</code>，<code>docker export</code>保存的是<code>container</code>；</li>
+<li><code>docker load</code>用来载入<code>image</code>，<code>docker import</code>用来载入<code>container</code>包，但两者都会恢复为<code>image</code>；</li>
+<li><code>docker load</code>不能对载入的<code>image</code>重命名，而docker import可以为<code>image</code>指定新名称。</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Docker安装]]></title>
+        <id>https://jsrdzhk.github.io/post/docker-installation/</id>
+        <link href="https://jsrdzhk.github.io/post/docker-installation/">
+        </link>
+        <updated>2021-07-11T02:05:24.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="一-mac-os和windows">一、Mac OS和Windows</h2>
+<p><code>Mac OS</code>可以直接去docker官方网站下载<code>Docker Desktop</code>，也可以使用<code>Homebrew</code>安装:<code>brew cask install docker</code>。<code>Windows</code>直接官方网站下载<code>Docker Desktop</code>即可。</p>
+<h2 id="二-linux">二、Linux</h2>
+<ol>
+<li>
+<p>更新ubuntu的apt源索引：sudo apt-get update</p>
+</li>
+<li>
+<p>安装包允许apt通过HTTPS使用仓库：</p>
+<pre><code class="language-shell">sudo apt-get install \
+apt-transport-https \
+ca-certificates \
+curl \
+software-properties-common
+</code></pre>
+</li>
+<li>
+<p>添加Docker官方GPG Key：</p>
+<pre><code class="language-shell">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+</code></pre>
+</li>
+<li>
+<p>设置Docker稳定版仓库：</p>
+<pre><code class="language-shell">sudo add-apt-repository \
+&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) \
+stable&quot;
+</code></pre>
+</li>
+<li>
+<p>添加仓库后，更新apt源索引：</p>
+<pre><code class="language-shell">sudo apt-get update
+</code></pre>
+</li>
+<li>
+<p>安装最新版Docker CE(社区版)：</p>
+<pre><code class="language-shell">sudo apt-get install docker-ce
+</code></pre>
+</li>
+<li>
+<p>检测Docker CE 是否安装正确：</p>
+<pre><code class="language-shell">sudo docker run hellp-world
+</code></pre>
+</li>
+</ol>
+<h2 id="三-配置无需sudo运行">三、配置无需sudo运行</h2>
+<p>在<code>Linux</code>中安装玩<code>Docker</code>后，需要进行以下配置：</p>
+<ol>
+<li>创建<code>Docker</code> group:<code>sudo groupadd docker</code>;</li>
+<li>添加当前用户进入用户组:<code>sudo usermod -aG docker ${USER}</code>;</li>
+<li>让修改生效:<code>su -s ${USER}</code>,或者直接登入登出。</li>
+</ol>
+<h2 id="四-配置国内镜像源">四、配置国内镜像源</h2>
+<h3 id="41-mac-os">4.1 Mac OS</h3>
+<p>对于使用 macOS 的用户，在任务栏点击 Docker Desktop 应用图标 -&gt; Perferences，在左侧导航菜单选择 Docker Engine，在右侧像下边一样编辑 json 文件。修改完成之后，点击 Apply &amp; Restart 按钮，Docker 就会重启并应用配置的镜像地址了。</p>
+<pre><code class="language-json">{
+  &quot;registry-mirrors&quot;: [
+    &quot;https://hub-mirror.c.163.com&quot;
+  ]
+}
+</code></pre>
+<h3 id="42-linux">4.2 Linux</h3>
+<h4 id="421-systemdubuntu-1604-debian-8-centos-7">4.2.1 systemd(Ubuntu 16.04+、Debian 8+、CentOS 7)</h4>
+<p>在 /etc/docker/daemon.json 中写入如下内容（如果文件不存在请新建该文件）:</p>
+<pre><code class="language-json">{
+  &quot;registry-mirrors&quot;: [
+    &quot;https://hub-mirror.c.163.com&quot;
+  ]
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[二叉树]]></title>
         <id>https://jsrdzhk.github.io/post/er-cha-shu/</id>
@@ -1281,108 +1408,6 @@ public inline fun &lt;T, R : Comparable&lt;R&gt;&gt; Iterable&lt;T&gt;.maxByOrNu
 </code></pre>
 <h2 id="二-总结">二、总结</h2>
 <p><code>lambda</code>函数大大简化了开发中的冗余代码，而<code>Kotlin</code>的简洁高效也开始初步展现。(C++:什么叫编程语言的皇冠啊😄)</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[写给开发者Kotlin指引（一）]]></title>
-        <id>https://jsrdzhk.github.io/post/xie-gei-kai-fa-zhe-kotlin-zhi-yin-yi/</id>
-        <link href="https://jsrdzhk.github.io/post/xie-gei-kai-fa-zhe-kotlin-zhi-yin-yi/">
-        </link>
-        <updated>2021-02-19T07:57:13.000Z</updated>
-        <content type="html"><![CDATA[<p>本文从开发者学习第二门语言的角度，力求用最简洁的语言说明<code>Kotlin</code>的用法。在你花10分钟阅读完后，应该可以写出不那么Kotlin的Kotlin代码。</p>
-<h2 id="一-和java的关系">一、和Java的关系</h2>
-<blockquote>
-<p>Kotlin is a cross-platform, statically typed, general-purpose programming language with type inference. Kotlin is designed to interoperate fully with Java, and the JVM version of Kotlin's standard library depends on the Java Class Library, but type inference allows its syntax to be more concise.</p>
-</blockquote>
-<p>在维基百科中说明了<code>Kotlin</code>是可以与Java进行完全互操作的语言。事实上，Kotlin的编译器跟Java的编译器一样，都是将代码转化为了JVM能够理解的字节码。类似于C++语言先通过编译器编译成汇编语言，汇编语言再由汇编器生成了机器码，最后再由链接器链接为可执行文件。</p>
-<h2 id="二-函数">二、函数</h2>
-<p>当提及到一门语言，函数和变量是必须的，直接从一个简单的函数来看。</p>
-<pre><code class="language-kotlin">fun defaultArguments(param1: Int = 1, param2: String = &quot;asa&quot;, param3: Double = 3.3): Unit {
-    println(&quot;$param1,$param2,$param3&quot;)
-}
-
-fun namedArguments(param1: Int = 1, param2: String = &quot;asa&quot;, param3: Double): Unit =
-    println(&quot;$param2,${param1 + param3}&quot;)
-</code></pre>
-<p><code>Kotlin</code>的函数定义非常简单，以<code>fun</code>作为函数的标记，对于函数的形参，使用后置类型的方式来说明形参的类型，它还支持默认参数，函数的返回类型在形参之后使用冒号来说明，<code>Unit</code>相当于一般语言中的<code>void</code>，表示函数的返回类型没用。函数体类似于大部分语言，使用大括号来表示，如果函数体为表达式（表达式的概念现在暂时不管，直接使用大括号即可），也可以像声明变量那样用<code>=</code>。</p>
-<p>默认参数的用法很简单，你可以选择在任意参数开始使用默认参数，例如<code>defaultArguments()</code>或者<code>defaultArguments(3,&quot;as&quot;)</code>，这没什么好说的。具名参数（named argument）是<code>Kotlin</code>中的一个特色（用过<code>Python</code>的人可以跳过这一部分，因为没什么区别），他允许函数调用者指定对应参数的值，配合默认参数，会让函数的调用更加灵活。例如，上面的<code>namedArguments</code>的函数可以这样调用:</p>
-<pre><code class="language-kotlin">namedArguments(param3 = 1.3)
-</code></pre>
-<p>因为<code>namedArguments</code>只给前两个参数设置了默认参数，所以如果没有具名参数，那么就得给出所有参数。在使用具名参数后，函数的形参可以用更加合理的方式来排布顺序，而不需要为了配合默认参数调整形参的顺序。</p>
-<p>OK，现在让我们运行一下上面的代码看看效果吧先给出完整的<code>main.kt</code>文件：</p>
-<pre><code class="language-kotlin">fun defaultArguments(param1: Int = 1, param2: String = &quot;asa&quot;, param3: Double = 3.3): Unit {
-    println(&quot;$param1,$param2,$param3&quot;)
-}
-
-fun namedArguments(param1: Int = 1, param2: String = &quot;asa&quot;, param3: Double): Unit =
-    println(&quot;$param2,${param1 + param3}&quot;)
-    
-fun main(args: Array&lt;String&gt;) {
-    defaultArguments(1)
-    defaultArguments(1, &quot;as&quot;)
-    namedArguments(param3 = 1.3)
-}
-</code></pre>
-<p><code>Kotlin</code>的入口函数为<code>main</code>函数，想要运行Kotlin代码，先要将其编译成jvm虚拟机能够识别的字节码，<code>Kotlin</code>为我们提供了编译器，在Mac OS平台上，可以直接使用<code>brew install kotlin</code>来安装<code>Kotlin</code>的编译套件，其他平台的安装参考<a href="https://kotlinlang.org/docs/tutorials/command-line.html">这里</a>。</p>
-<p>使用以下命令来编译代码为<code>jar</code>文件：</p>
-<pre><code>kotlinc main.kt -include-runtime -d main.jar
-</code></pre>
-<p>然后，类似于<code>Java</code>，直接使用<code>java -jar main.jar</code>来运行，看一下结果：</p>
-<pre><code>1,asa,3.3
-1,as,3.3
-asa 2.3
-</code></pre>
-<p>上述的代码中还包括一个非常实用的字符串处理技巧，字符串格式化一直是编程时永远绕不开的话题，Java和C的处理方式是在字符串中用<code>%s %d</code>作为占位符来进行字符串格式化，这种方法非常不友好，用户需要记住各种各样的占位符。<code>Python</code>的处理稍微高了那么一点点🤏，使用<code>{}</code>来进行占位，由于Python中将对象转化为字符串非常方便，所以用户处理起来也不是那么痛苦。现在，<code>Kotlin</code>彻底释放了用户，直接在字符串里面用<code>$</code>加上变量名的方式就可以了，<code>Kotlin</code>会帮你执行<code>toString</code>的操作，甚至还可以在里面执行表达式，只要用<code>${}</code>将表达式括起来即可。</p>
-<h2 id="三-变量">三、变量</h2>
-<p><code>Kotlin</code>声明变量很简单，看例子：</p>
-<pre><code class="language-kotlin">fun variableFundamental() {
-    var mutableValue: Int = 100
-    println(mutableValue)
-    mutableValue = 101
-    println(mutableValue)
-    val immutableValue = 10
-    println(immutableValue)
-}
-</code></pre>
-<p><code>val</code>修饰的变量为不可变的变量，注意这里的不可变，理解为它的引用不可变，如果你生命的是一个<code>ArrayList</code>，你还是可以自由地往里面添加元素。<code>var</code>修饰的变量是可变变量。</p>
-<h2 id="四-类">四、类</h2>
-<p>虽然<code>Kotlin</code>也是JVM系的语言，但是可以看到前一节的<code>main.kt</code>的三个函数不在类中，但是也可以编译运行。事实上，即使在<code>Java</code>中，静态函数也是顶级的函数，类名只是静态函数的命名空间（C++用户应该非常熟悉这个概念）。虽然如此，但是出了入口<code>main</code>函数，最好不要定义这种函数，就跟<code>Java</code>一样，用类来组织代码就好了。</p>
-<p>在<code>Kotlin</code>中，类的定义非常的简洁，例如：</p>
-<pre><code class="language-kotlin">class KotlinClass(param1: String, private val member1: Int = 10, val member2: String = &quot;&quot;)
-</code></pre>
-<p><code>Kotlin</code>通过<code>class</code>关键词来标记类，后面跟类名，这个十分好理解，后面的括号中包括的是类的构造函数的参数，如果参数被用<code>val</code>或者<code>var</code>修饰了，该参数就会自动成为类的成员变量。这样做的优点就是在<code>Kotlin</code>里面不再需要写<code>this.member1=member1</code>这样的废话了😄。这里的成员默认是<code>public</code>的，如果想要设置为<code>private</code>，只要在<code>val</code>前面加上访问权限修饰符<code>private</code>即可。<br>
-传统的面向对象语言，不管是C++还是Java，都会提供一个叫构造函数重载的概念，即可以通过不同的参数来以不同的逻辑来构造对象。<code>Kotlin</code>里面没有重载这一说，<code>Kotlin</code>通过为构造函数提供默认参数实现了函数的重载，类似于前面的具名参数（<code>Python</code>中通过为<code>__init__</code>函数设置默认参数取得了同样的效果）。</p>
-<p>下面扩充一下上面的类:</p>
-<pre><code class="language-kotlin">class KotlinClass(param1: String, private val member1: Int = 10, var member2: String = &quot;&quot;) {
-    companion object {
-        fun staticFunc() {
-            println(&quot;this static func&quot;)
-        }
-    }
-
-    private var param1Receiver: String = param1
-
-    private fun privateMemberFunc1() {
-        println(member1)
-    }
-
-    fun publicMemberFunc() {
-        println(member2)
-    }
-}
-</code></pre>
-<p><code>Kotlin</code>中没有<code>static</code>关键词，它使用<code>companion object</code>块来放置静态变量和函数，它的成员函数也类似<code>Java</code>，同样<code>public</code>为默认修饰符。</p>
-<h2 id="五-总结">五、总结</h2>
-<p>这一节简单叙述了<code>Kotlin</code>的变量声明、函数和类的定义，它的简洁和优雅一览无余，现在编写完整的<code>Kotlin</code>程序已经毫无问题了，但是想要进一步感受<code>Kotlin</code>的魅力，还需要继续探索。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[README]]></title>
-        <id>https://jsrdzhk.github.io/post/readme/</id>
-        <link href="https://jsrdzhk.github.io/post/readme/">
-        </link>
-        <updated>2021-02-18T08:16:20.000Z</updated>
-        <content type="html"><![CDATA[<p>software developer,loler,crossfit,guitar player</p>
 ]]></content>
     </entry>
 </feed>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>proxy | Rodney Cheung&#39;s House</title>
+<title>Docker镜像导入导出 | Rodney Cheung&#39;s House</title>
 <meta name="description" content="The king is noble only for practicing his way😄!">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,6 +23,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House</a></h3>
@@ -79,40 +80,80 @@
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
-          <h2 class="current-tag">标签: proxy</h2>
-          
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/">terminal如何走代理</a>
-    </h2>
-    <p class="article-meta">
-      2021-07-01
-      
-        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge secondary">
-          proxy
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
+          <article class="article">
+            <h1>Docker镜像导入导出</h1>
+            <p class="article-meta">
+              2021-07-11
+              
+                <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+                  docker
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>在缺乏网络的环境中，可以将<code>Docker</code>镜像导出，进行离线部署。</p>
+<h2 id="一-save-load">一、save &amp;&amp; load</h2>
+<p><code>docker save</code>命令可以将多个镜像导出到文件中，用法如下:</p>
+<pre><code class="language-sh">&gt;docker save --help
 
+Usage:  docker save [OPTIONS] IMAGE [IMAGE...]
 
+Save one or more images to a tar archive (streamed to STDOUT by default)
+
+Options:
+      --help            Print usage
+  -o, --output string   Write to a file, instead of STDOUT
+</code></pre>
+<p>例如：</p>
+<pre><code class="language-sh">docker save -o wq_ci.tar postgres:10 jenkins/jenkins:lts sonarqube:lts
+</code></pre>
+<p>在导出完成后，可以使用<code>docker load -i &lt;saved_image.tar&gt;</code>来加载导出的<code>image</code>。</p>
+<h2 id="二-export-import">二、export &amp;&amp; import</h2>
+<p><code>docker export</code>可以将<code>container</code>导出，用法如下:</p>
+<pre><code class="language-sh">&gt;docker export --help
+
+Usage:  docker export [OPTIONS] CONTAINER
+
+Export a container's filesystem as a tar archive
+
+Options:
+      --help            Print usage
+  -o, --output string   Write to a file, instead of STDOUT
+</code></pre>
+<p>例如：</p>
+<pre><code class="language-sh">docker export -o postgres-export.tar postgres
+</code></pre>
+<p>使用<code>docker import</code>可以从导出文件生成<code>image</code>，例如：</p>
+<pre><code class="language-sh">docker import postgres-export.tar postgres:latest
+</code></pre>
+<h2 id="三-save和export区别">三、save和export区别</h2>
+<ol>
+<li><code>docker save</code>保存的是<code>image</code>，<code>docker export</code>保存的是<code>container</code>；</li>
+<li><code>docker load</code>用来载入<code>image</code>，<code>docker import</code>用来载入<code>container</code>包，但两者都会恢复为<code>image</code>；</li>
+<li><code>docker load</code>不能对载入的<code>image</code>重命名，而docker import可以为<code>image</code>指定新名称。</li>
+</ol>
+
+            </div>
+          </article>
         </div>
-        <div class="row flex-edges">
-  
-  
-</div>
-
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">
+                <h3 class="post-title">
+                  Docker安装
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
       </div>
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://jsrdzhk.github.io/images/avatar.png?v=1625969413175" class="no-responsive avatar">
@@ -219,15 +260,15 @@
     </div>
     <div class="row">
       
-        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge success">
           docker
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge success">
           data structure
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge warning">
           tree
         </a>
       
@@ -235,23 +276,23 @@
           proxy
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
           Android
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge secondary">
           Git
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge success">
           cpp
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge warning">
           Kotlin
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge success">
           Python
         </a>
       
@@ -261,6 +302,7 @@
     Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
   </div>
 </div>
+
 
     </div>
 

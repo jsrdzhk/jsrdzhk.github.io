@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>proxy | Rodney Cheung&#39;s House</title>
+<title>Docker安装 | Rodney Cheung&#39;s House</title>
 <meta name="description" content="The king is noble only for practicing his way😄!">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,6 +23,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House</a></h3>
@@ -79,40 +80,109 @@
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
-          <h2 class="current-tag">标签: proxy</h2>
-          
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/">terminal如何走代理</a>
-    </h2>
-    <p class="article-meta">
-      2021-07-01
-      
-        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge secondary">
-          proxy
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
+          <article class="article">
+            <h1>Docker安装</h1>
+            <p class="article-meta">
+              2021-07-11
+              
+                <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge ">
+                  docker
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="一-mac-os和windows">一、Mac OS和Windows</h2>
+<p><code>Mac OS</code>可以直接去docker官方网站下载<code>Docker Desktop</code>，也可以使用<code>Homebrew</code>安装:<code>brew cask install docker</code>。<code>Windows</code>直接官方网站下载<code>Docker Desktop</code>即可。</p>
+<h2 id="二-linux">二、Linux</h2>
+<ol>
+<li>
+<p>更新ubuntu的apt源索引：sudo apt-get update</p>
+</li>
+<li>
+<p>安装包允许apt通过HTTPS使用仓库：</p>
+<pre><code class="language-shell">sudo apt-get install \
+apt-transport-https \
+ca-certificates \
+curl \
+software-properties-common
+</code></pre>
+</li>
+<li>
+<p>添加Docker官方GPG Key：</p>
+<pre><code class="language-shell">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+</code></pre>
+</li>
+<li>
+<p>设置Docker稳定版仓库：</p>
+<pre><code class="language-shell">sudo add-apt-repository \
+&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) \
+stable&quot;
+</code></pre>
+</li>
+<li>
+<p>添加仓库后，更新apt源索引：</p>
+<pre><code class="language-shell">sudo apt-get update
+</code></pre>
+</li>
+<li>
+<p>安装最新版Docker CE(社区版)：</p>
+<pre><code class="language-shell">sudo apt-get install docker-ce
+</code></pre>
+</li>
+<li>
+<p>检测Docker CE 是否安装正确：</p>
+<pre><code class="language-shell">sudo docker run hellp-world
+</code></pre>
+</li>
+</ol>
+<h2 id="三-配置无需sudo运行">三、配置无需sudo运行</h2>
+<p>在<code>Linux</code>中安装玩<code>Docker</code>后，需要进行以下配置：</p>
+<ol>
+<li>创建<code>Docker</code> group:<code>sudo groupadd docker</code>;</li>
+<li>添加当前用户进入用户组:<code>sudo usermod -aG docker ${USER}</code>;</li>
+<li>让修改生效:<code>su -s ${USER}</code>,或者直接登入登出。</li>
+</ol>
+<h2 id="四-配置国内镜像源">四、配置国内镜像源</h2>
+<h3 id="41-mac-os">4.1 Mac OS</h3>
+<p>对于使用 macOS 的用户，在任务栏点击 Docker Desktop 应用图标 -&gt; Perferences，在左侧导航菜单选择 Docker Engine，在右侧像下边一样编辑 json 文件。修改完成之后，点击 Apply &amp; Restart 按钮，Docker 就会重启并应用配置的镜像地址了。</p>
+<pre><code class="language-json">{
+  &quot;registry-mirrors&quot;: [
+    &quot;https://hub-mirror.c.163.com&quot;
+  ]
+}
+</code></pre>
+<h3 id="42-linux">4.2 Linux</h3>
+<h4 id="421-systemdubuntu-1604-debian-8-centos-7">4.2.1 systemd(Ubuntu 16.04+、Debian 8+、CentOS 7)</h4>
+<p>在 /etc/docker/daemon.json 中写入如下内容（如果文件不存在请新建该文件）:</p>
+<pre><code class="language-json">{
+  &quot;registry-mirrors&quot;: [
+    &quot;https://hub-mirror.c.163.com&quot;
+  ]
+}
+</code></pre>
 
-
+            </div>
+          </article>
         </div>
-        <div class="row flex-edges">
-  
-  
-</div>
-
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">
+                <h3 class="post-title">
+                  二叉树
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
       </div>
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://jsrdzhk.github.io/images/avatar.png?v=1625969413175" class="no-responsive avatar">
@@ -223,15 +293,15 @@
           docker
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
           data structure
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge secondary">
           tree
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge warning">
           proxy
         </a>
       
@@ -239,15 +309,15 @@
           Android
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge secondary">
           Git
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge ">
           cpp
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge success">
           Kotlin
         </a>
       
@@ -261,6 +331,7 @@
     Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
   </div>
 </div>
+
 
     </div>
 
