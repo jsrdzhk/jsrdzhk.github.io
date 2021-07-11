@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Git基础(一) | Rodney Cheung&#39;s House</title>
+<meta name="description" content="The king is noble only for practicing his way😄!">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1625969878028">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Git基础(一)</h1>
+            <p class="article-meta">
+              2021-07-11
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="一-基础概念">一、基础概念</h2>
+<h3 id="11-什么是git">1.1 什么是git</h3>
+<p><code>git</code>是版本管理系统（Version control systems ，VCS），用于对项目的版本进行跟踪管理。在git出现之前，拥有很多VCS，这些VCS的工作原理是对于项目中的每一个文件，保存他们随时间积累的改动。<br>
+<img src="https://jsrdzhk.github.io/post-images/1625969667803.png" alt="normal vcs" loading="lazy"></p>
+<p>git不同于其他版本管理工具，它每次改动都会保存所有项目文件的快照，如果某些文件在这次改动中没有变化，那么git只保存一个指向前一版本的链接。<br>
+<img src="https://jsrdzhk.github.io/post-images/1625969745519.png" alt="git vcs" loading="lazy"></p>
+<h3 id="12-git如何保证检查到所有改动">1.2 git如何保证检查到所有改动</h3>
+<p>git会根据项目目录结构以及文件内容，通过<code>SHA-1</code>算法计算生成校验和，所以只要你对项目做了改动，git就能察觉。</p>
+<h3 id="13-git的三种工作区域">1.3 git的三种工作区域</h3>
+<p>git的工作区域分为工作区、暂存区和已提交区，当我们在项目中新增、修改文件时，这些改动都在工作区中。如果我们修改完成，使用<code>git add</code>命令，就可以讲这些改动由工作区移到暂存区。当文件处于暂存区时，我们就可以使用<code>git commit</code>命令将文件由暂存区挪到已提交区。当文件处于已提交区域时，所有的改动都会被永久保存在本地数据库中。如果你将项目根目录的<code>.git</code>文件夹删除，就会永久失去所有的版本记录。</p>
+<figure data-type="image" tabindex="1"><img src="https://jsrdzhk.github.io/post-images/1625969769673.png" alt="git area" loading="lazy"></figure>
+<h2 id="二-git基本使用方法">二、git基本使用方法</h2>
+<h3 id="21-git初始配置">2.1 git初始配置</h3>
+<p>当我们初次使用git，用到的最简单且必要的配置就是为git配置一个全局可用的提交者(还是作者？提交者和作者的区别？)的名字和其邮箱，其中<code>--global</code>参数表示本次配置对于本机所有的git仓库都有用，除非你在项目的局部配置文件里面进行了同样的配置，局部的配置会覆盖全局的配置。</p>
+<pre><code class="language-shell">git config --global user.name &quot;zhanghaokang&quot;
+git config --global user.email &quot;zhanghaokang@antiy.cn&quot;
+</code></pre>
+<p>此外，还需要配置git命令使用的编辑器，下面的命令就是将git默认的编辑器改为<code>vim</code>。</p>
+<pre><code class="language-shell">git config --global core.editor vim
+</code></pre>
+<p>当使用<code>git commit</code>命令时，如果不使用<code>-m</code>参数加上提交信息，就会打开配置的editor让你进行下一步的操作。<br>
+还有一个可选的配置：</p>
+<pre><code class="language-shell">git config --global core.quotepath false
+</code></pre>
+<p>该配置会使<code>git status</code>的结果中的中文正常显示。</p>
+<p>使用<code>git config --list</code>就可以展示出当前的所有配置。</p>
+<h3 id="22-初始化仓库">2.2 初始化仓库</h3>
+<p>在项目根目录使用<code>git init</code>就可以将项目生成为git项目，该操作会在项目根目录生成一个<code>.git</code>目录，他就用于记录版本的变化，并且我们可以在其中进行项目特有的配置，例如修改该仓库特有的提交者姓名和邮箱。</p>
+<h3 id="23-将修改提交到本地仓库中">2.3 将修改提交到本地仓库中</h3>
+<p>当项目被初始化为git仓库后，只要你在当前目录中新增文件时，git就会将该文件列为未被跟踪状态。使用<code>git status</code>可以看到当前仓库所有文件的状态。</p>
+<pre><code class="language-shell">On branch master
+Your branch is up to date with 'origin/master'.
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+	2.环境篇/工具部署和使用/开发工具/git/1.基础/
+	2.环境篇/工具部署和使用/开发工具/git/git_reset_commit.md
+	images/tools_deploy/dev/
+</code></pre>
+<p>可以看到，当前有一些文件和文件夹处于<code>Untracked files</code>中，这些文件处于未跟踪状态，对其进行修改git也不能知道改动的内容。此时，就需要使用<code>git add</code>命令，将文件添加到暂存区中。</p>
+<pre><code class="language-shell">git add 2.环境篇/工具部署和使用/开发工具/git/1.基础/git_fundamental.md
+</code></pre>
+<p>在上面的命令结束后，再次运行<code>git status</code>来查看当前工作区的状态。</p>
+<pre><code class="language-shell">On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes to be committed:
+  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)
+	new file:   2.环境篇/工具部署和使用/开发工具/git/1.基础/git_fundamental.md
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+	2.环境篇/工具部署和使用/开发工具/git/git_reset_commit.md
+	images/tools_deploy/dev/
+</code></pre>
+<p>可以看到，刚刚添加到暂存区的文件显示在<code>Changes to be committed</code>中，<code>git</code>还提示我们，如果我们想将该文件从暂存区移除，可以使用<code>git restore --staged &lt;file_name&gt;</code>命令。</p>
+<p>当我们再次对该文件进行修改后，再次使用<code>git status</code>查看状态。</p>
+<pre><code class="language-shell">On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes to be committed:
+  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)
+	new file:   2.环境篇/工具部署和使用/开发工具/git/1.基础/git_fundamental.md
+
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+	modified:   2.环境篇/工具部署和使用/开发工具/git/1.基础/git_fundamental.md
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+	2.环境篇/工具部署和使用/开发工具/git/git_reset_commit.md
+	images/tools_deploy/dev/
+</code></pre>
+<p>可以看到，现在又多出了一列<code>Changes not staged for commit</code>，这一列的文件中表示该文件已经被git所跟踪但是还有修改没用添加到暂存区。再次使用<code>git add</code>将修改添加到暂存区。</p>
+<p>当所有的修改都添加到暂存区后，就可以使用<code>git commit</code>命令将这些修改挪到已提交区。</p>
+<pre><code class="language-shell">git commit -m &quot;Develop | add git_fundamental.md&quot;
+</code></pre>
+<p>其中<code>-m</code>表示添加提交信息，如果不加该参数，git会打开你配置的默认编辑器，然后你在那里修改提交信息。</p>
+<p>当该操作完成后，所有变动就会被添加到本地git仓库，你可以使用<code>git log</code>来查看所有提交记录。</p>
+<pre><code>commit 552ec14f9ccdce80ae8c686820add3df7c800f9e (HEAD -&gt; master, origin/master, origin/HEAD)Author: zhaosq &lt;zhaosq0815@163.com&gt;Date:   Mon Nov 23 10:28:21 2020 +0800    Maintain | update test_tech on Nov 2020    Signed-off-by: zhaosq &lt;zhaosq0815@163.com&gt;commit f99fec9901064a78c7290e6bbd95de9660b17225Author: hangxu &lt;hangxu@antiy.cn&gt;Date:   Mon Nov 23 10:04:18 2020 +0800    Bug | fix style error
+</code></pre>
+<p>该命令会显示项目的所有提交历史，<code>commit</code>后面跟的是<code>commit id</code>，用于标记当前版本（SHA-1生成的校验和）。如果你后悔了，可以使用<code>git reset</code>命令将本地的内容返回到对应<code>commit id</code>的版本。</p>
+<pre><code class="language-shell">git reset --hard f99fec9901064a78c7290e6bbd95de9660b17225
+</code></pre>
+<p>在<code>--hard</code>表示将所有内容返回到<code>f99fec9901064a78c7290e6bbd95de9660b17225</code>版本，如果使用<code>--soft</code>，那么<code>f99fec9901064a78c7290e6bbd95de9660b17225</code>版本到当前版本的所有改动将会保留在暂存区。</p>
+<p>上述就是git的基本工作流程，下图也很好的概括了这些常用操作。</p>
+<figure data-type="image" tabindex="2"><img src="https://jsrdzhk.github.io/post-images/1625969819544.png" alt="git work flow" loading="lazy"></figure>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">
+                <h3 class="post-title">
+                  Docker镜像导入导出
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1625969878028" class="no-responsive avatar">
+    <div class="text-muted">The king is noble only for practicing his way😄!</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/">terminal如何走代理</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/android-appxi-tong-qian-ming/">Android app系统签名</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-fu-wu-qi-tian-jia-ssh-key/">Git服务器添加SSH Key</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-xian-cheng-chi-shi-xian/">简单的线程池实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/android-deeplink/">Android deeplink</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/best-practice-of-pythons-project-structure/">Best practice of Python&#39;s project structure</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge secondary">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge ">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge warning">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge success">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge ">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>
