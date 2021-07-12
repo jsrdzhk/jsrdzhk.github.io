@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://jsrdzhk.github.io</id>
     <title>Rodney Cheung&apos;s House</title>
-    <updated>2021-07-11T02:18:00.841Z</updated>
+    <updated>2021-07-12T10:34:22.052Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://jsrdzhk.github.io"/>
     <link rel="self" href="https://jsrdzhk.github.io/atom.xml"/>
@@ -10,6 +10,150 @@
     <logo>https://jsrdzhk.github.io/images/avatar.png</logo>
     <icon>https://jsrdzhk.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Rodney Cheung&apos;s House</rights>
+    <entry>
+        <title type="html"><![CDATA[图相关]]></title>
+        <id>https://jsrdzhk.github.io/post/tu-xiang-guan/</id>
+        <link href="https://jsrdzhk.github.io/post/tu-xiang-guan/">
+        </link>
+        <updated>2021-07-12T10:30:31.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="一-有向图的遍历">一、有向图的遍历</h2>
+<p><a href="https://leetcode-cn.com/problems/all-paths-from-source-to-target/submissions/">797. 所有可能的路径 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>依然是使用递归进行遍历，使用一个变量记录当前路径的情况，在递归跳出的地方弹出当前节点的值（回溯）：</p>
+<pre><code class="language-c++">void traverse(std::vector&lt;std::vector&lt;int&gt;&gt;&amp; graph, int idx, int target,
+              std::vector&lt;std::vector&lt;int&gt;&gt;&amp; res, std::vector&lt;int&gt;&amp; seq) {
+    if (idx == target) {
+        seq.push_back(idx);
+        res.push_back(seq);
+        seq.pop_back();
+    }
+    auto&amp; g = graph[idx];
+    for (auto num : g) {
+        seq.push_back(idx);
+        traverse(graph, num, target, res, seq);
+        seq.pop_back();
+    }
+}
+
+std::vector&lt;std::vector&lt;int&gt;&gt; allPathsSourceTarget(
+    std::vector&lt;std::vector&lt;int&gt;&gt;&amp; graph) {
+    std::vector&lt;int&gt; seq;
+    std::vector&lt;std::vector&lt;int&gt;&gt; res;
+    traverse(graph, 0, graph.size() - 1, res, seq);
+    return res;
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[二叉搜索树（BST）]]></title>
+        <id>https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/</id>
+        <link href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">
+        </link>
+        <updated>2021-07-12T10:29:17.000Z</updated>
+        <content type="html"><![CDATA[<p>二叉搜索树基于二叉树，其左子树的所有节点均小于根结点，而右子树的所有节点均大于根结点，同时其左右子树又都是二叉搜索树。</p>
+<h2 id="一-二叉搜索树中的第k个最小元素">一、二叉搜索树中的第K个最小元素</h2>
+<p><a href="https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/">230. 二叉搜索树中第K小的元素 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>使用中序遍历就可以得到二叉搜索树中元素的升序排列：</p>
+<pre><code class="language-c++">void traverse(TreeNode* n, int k, int&amp; c, int&amp; res) {
+    if (!n) {
+        return;
+    }
+    traverse(n-&gt;left, k, c, res);
+    ++c;
+    if (c == k) {
+        res = n-&gt;val;
+        return;
+    } else if (c &gt; k) {
+        return;
+    } else {
+        traverse(n-&gt;right, k, c, res);
+    }
+}
+
+int kthSmallest(TreeNode* root, int k) {
+    int res = 0, c = 0;
+    traverse(root, k, c, res);
+    return res;
+}
+</code></pre>
+<p>当每次读取bst中的序列时，都自增计数器：</p>
+<ul>
+<li>当计数器等于要求的值时，保存结果；</li>
+<li>当计数器小于要求的值时，继续读取；</li>
+<li>当计数器大雨要求的值时，从递归中跳出。</li>
+</ul>
+<h2 id="二-把二叉搜索树转化为累加树">二、把二叉搜索树转化为累加树</h2>
+<p><a href="https://leetcode-cn.com/problems/convert-bst-to-greater-tree/">538. 把二叉搜索树转换为累加树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>根据题意，累加树就是使每个节点 <code>node</code> 的新值等于原树中大于或等于 <code>node.val</code> 的值之和，简单来说就是将二叉搜索树中所有节点的值都增加该节点右子树所有节点之和。</p>
+<p>中序遍历二叉搜索树最后才能访问到右子树，此时我们倒过来。先访问树的右子树，使用一个变量记录当前的右子树之和，然后将该变量加到树的根结点上，再访问左子树:</p>
+<pre><code class="language-c++">void traverseBst(TreeNode* n, int&amp; sum) {
+    if (!n) {
+        return;
+    }
+    traverseBst(n-&gt;right, sum);
+    n-&gt;val = n-&gt;val += sum;
+    sum = n-&gt;val;
+    traverseBst(n-&gt;left, sum);
+}
+
+TreeNode* bstToGst(TreeNode* root) {
+    int sum = 0;
+    traverseBst(root, sum);
+    return root;
+}
+</code></pre>
+<h2 id="三-不同的二叉搜索树">三、不同的二叉搜索树</h2>
+<p><a href="https://leetcode-cn.com/problems/unique-binary-search-trees/">96. 不同的二叉搜索树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>当固定某个值<code>a</code>为根结点时，其左侧的值为<code>[1,a-1]</code>，右侧的值为<code>[a+1,n]</code>，定义<code>f(n)</code>为n个不同的数组成的二叉搜索树的种类，那么此时:</p>
+<pre><code>f(n)=f(a-1-1+1)+f(n-(a+1)+1)
+</code></pre>
+<p>由此将求得<code>[1,n]</code>二叉搜索树的种类分解为了两个子问题，而当n=1或者0时，<code>f(n)</code>的结果显然为<code>1</code>，由此可以推断出：</p>
+<pre><code>f(2)=f(1)*f(0)+f(0)*f(1)=2
+f(3)=f(2)*f(0)+f(1)*f(1)+f(0)*f(2)=5
+...
+</code></pre>
+<p>代码如下：</p>
+<pre><code class="language-c++">int numTrees(int n) {
+    std::vector&lt;int&gt; dp{1, 1};
+    for (auto i = 2; i &lt;= n; ++i) {
+        dp.push_back(0);
+        for (auto j = 0; j &lt; i; ++j) {
+            dp[i] += dp[j] * dp[i - 1 - j];
+        }
+    }
+    return dp[n];
+}
+</code></pre>
+<h2 id="四-不同的二叉搜索树二">四、不同的二叉搜索树（二）</h2>
+<p><a href="https://leetcode-cn.com/problems/unique-binary-search-trees-ii/submissions/">95. 不同的二叉搜索树 II - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<pre><code class="language-c++">std::vector&lt;TreeNode*&gt; constructBst(int s, int e) {
+    std::vector&lt;TreeNode*&gt; res;
+    if (s &gt; e) {
+        res.push_back(nullptr);
+        return res;
+    }
+    for (auto i = s; i &lt;= e; ++i) {
+        auto leftRes = constructBst(s, i - 1);
+        auto rightRes = constructBst(i + 1, e);
+        for (auto l : leftRes) {
+            for (auto r : rightRes) {
+                TreeNode* node = new TreeNode(i);
+                node-&gt;left = l;
+                node-&gt;right = r;
+                res.push_back(node);
+            }
+        }
+    }
+    return res;
+}
+
+std::vector&lt;TreeNode*&gt; generateTrees(int n) {
+    return constructBst(1, n);
+}
+</code></pre>
+<p>对于每一次递归，都会计算当前递归层次所有的左右子树可构建的二叉搜索树的根结点。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Git基础(一)]]></title>
         <id>https://jsrdzhk.github.io/post/git-ji-chu-yi/</id>
@@ -743,6 +887,180 @@ void flatten(TreeNode* root) {
     p-&gt;right = right;
 }
 </code></pre>
+<h2 id="七-构建二叉树">七、构建二叉树</h2>
+<h3 id="71-最大二叉树">7.1 最大二叉树</h3>
+<p><a href="https://leetcode-cn.com/problems/maximum-binary-tree/">654. 最大二叉树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>首先要明确每次递归要做的事情，在这里，我们需要：</p>
+<ol>
+<li>求得数组的最大值</li>
+<li>将最大值构建为一个树节点并连接到父节点上</li>
+<li>分别对最大值左右两侧的子数组进行递归调用</li>
+</ol>
+<p><code>getMax</code>函数用于求得子数组的最大值及其所处的位置，这里我们选取的递归<code>base case</code>为当最大值的左右两侧是否还具有子数组：</p>
+<pre><code class="language-c++">std::pair&lt;int, int&gt; getMax(const std::vector&lt;int&gt;&amp; nums, int s, int e) {
+    int max = 0, maxPos = 0;
+    for (auto i = s; i &lt;= e; ++i) {
+        if (nums[i] &gt;= max) {
+            max = nums[i];
+            maxPos = i;
+        }
+    }
+    return std::make_pair(max, maxPos);
+}
+
+TreeNode* constructImpl(const std::vector&lt;int&gt;&amp; nums, int s, int e) {
+    auto maxPair = getMax(nums, s, e);
+    auto maxNum = maxPair.first;
+    auto maxPos = maxPair.second;
+    TreeNode* newNode = new TreeNode(maxNum);
+    if (maxPos &gt; s) {
+        newNode-&gt;left = constructImpl(nums, s, maxPos - 1);
+    }
+    if (maxPos &lt; e) {
+        newNode-&gt;right = constructImpl(nums, maxPos + 1, e);
+    }
+    return newNode;
+}
+
+TreeNode* constructMaximumBinaryTree(std::vector&lt;int&gt;&amp; nums) {
+    if (nums.empty()) {
+        return nullptr;
+    }
+    return constructImpl(nums, 0, nums.size() - 1);
+}
+</code></pre>
+<h3 id="72-从前序遍历和中序遍历结果构建二叉树">7.2 从前序遍历和中序遍历结果构建二叉树</h3>
+<p><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/">105. 从前序与中序遍历序列构造二叉树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>由于前序遍历的结果为：</p>
+<pre><code>[根结点] [左子树] [右子树]
+</code></pre>
+<p>而中序遍历的结果为：</p>
+<pre><code>[左子树] [根结点] [右子树]
+</code></pre>
+<p>同时序列中没有重复数字，所以可以根据前序遍历结果得到根结点的值，再到中序遍历的结果中找到该值所在的位置，就可以构建该节点及其左右子树，显然这是一个递归的构建过程：</p>
+<pre><code class="language-c++">std::size_t getInorderRootPos(int rootNodeVal, const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    for (auto i = inorderStart; i &lt;= inorderEnd; ++i) {
+        if (inorder[i] == rootNodeVal) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+TreeNode* constructBinaryTree(const std::vector&lt;int&gt;&amp; preorder,
+                              const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t preorderStart,
+                              std::size_t preorderEnd, std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    auto rootNodeVal = preorder[preorderStart];
+    TreeNode* n = new TreeNode(rootNodeVal);
+    auto inorderRootPos =
+        getInorderRootPos(rootNodeVal, inorder, inorderStart, inorderEnd);
+    auto leftSubTreeLen = inorderRootPos - inorderStart;
+    if (leftSubTreeLen &gt; 0) {
+        n-&gt;left = constructBinaryTree(preorder, inorder, preorderStart + 1,
+                                      preorderStart + leftSubTreeLen,
+                                      inorderStart, inorderRootPos - 1);
+    }
+    auto rightSubTreeLen = inorderEnd - inorderRootPos;
+    if (rightSubTreeLen &gt; 0) {
+        n-&gt;right = constructBinaryTree(
+            preorder, inorder, preorderStart + leftSubTreeLen + 1, preorderEnd,
+            inorderRootPos + 1, inorderEnd);
+    }
+    return n;
+}
+
+TreeNode* buildTree(std::vector&lt;int&gt;&amp; preorder, std::vector&lt;int&gt;&amp; inorder) {
+    if (preorder.empty()) {
+        return nullptr;
+    }
+    return constructBinaryTree(preorder, inorder, 0, preorder.size() - 1, 0,
+                               inorder.size() - 1);
+}
+</code></pre>
+<h3 id="73-从中序与后序遍历序列构造二叉树">7.3 从中序与后序遍历序列构造二叉树</h3>
+<p><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/">106. 从中序与后序遍历序列构造二叉树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>由于后序遍历的结果为：</p>
+<pre><code>[左子树] [右子树] [根结点]
+</code></pre>
+<p>所以可以找到跟节点的值。</p>
+<p>又因为序列没有重复数字，而中序遍历的结果为：</p>
+<pre><code>[左子树] [根结点] [右子树]
+</code></pre>
+<p>所以可以得到改根结点的左右子树，代码类似<code>7.2</code>：</p>
+<pre><code class="language-c++">std::size_t getInorderRootPos(int rootNodeVal, const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    for (auto i = inorderStart; i &lt;= inorderEnd; ++i) {
+        if (inorder[i] == rootNodeVal) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+TreeNode* constructBinaryTree(const std::vector&lt;int&gt;&amp; postorer,
+                              const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t postorerStart,
+                              std::size_t postorerEnd, std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    auto rootNodeVal = postorer[postorerEnd];
+    TreeNode* n = new TreeNode(rootNodeVal);
+    auto inorderRootPos =
+        getInorderRootPos(rootNodeVal, inorder, inorderStart, inorderEnd);
+    auto leftSubTreeLen = inorderRootPos - inorderStart;
+    if (leftSubTreeLen &gt; 0) {
+        n-&gt;left = constructBinaryTree(postorer, inorder, postorerStart,
+                                      postorerStart + leftSubTreeLen - 1,
+                                      inorderStart, inorderRootPos - 1);
+    }
+    auto rightSubTreeLen = inorderEnd - inorderRootPos;
+    if (rightSubTreeLen &gt; 0) {
+        n-&gt;right = constructBinaryTree(
+            postorer, inorder, postorerStart + leftSubTreeLen, postorerEnd - 1,
+            inorderRootPos + 1, inorderEnd);
+    }
+    return n;
+}
+
+TreeNode* buildTree(std::vector&lt;int&gt;&amp; inorder, std::vector&lt;int&gt;&amp; postorder) {
+    if (postorder.empty()) {
+        return nullptr;
+    }
+    return constructBinaryTree(postorder, inorder, 0, postorder.size() - 1, 0,
+                               inorder.size() - 1);
+}
+</code></pre>
+<h2 id="八-寻找重复子树">八、寻找重复子树</h2>
+<p><a href="https://leetcode-cn.com/problems/find-duplicate-subtrees/">652. 寻找重复的子树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>使用前序遍历，将所有子树的前序遍历结果保存在哈希表中，当前序遍历结果等于2时，说明此子树重复。</p>
+<pre><code class="language-c++">std::string getSubTreeSeq(TreeNode* n,
+                          std::unordered_map&lt;std::string, int&gt;&amp; counter,
+                          std::vector&lt;TreeNode*&gt;&amp; res) {
+    if (!n) {
+        return &quot;$&quot;;
+    }
+    std::ostringstream oss;
+    oss &lt;&lt; n-&gt;val &lt;&lt; ',' &lt;&lt; getSubTreeSeq(n-&gt;left, counter, res) &lt;&lt; ','
+        &lt;&lt; getSubTreeSeq(n-&gt;right, counter, res);
+    std::string seq = oss.str();
+    ++counter[seq];
+    if (counter[seq] == 2) {
+        res.push_back(n);
+    }
+    return seq;
+}
+
+std::vector&lt;TreeNode*&gt; findDuplicateSubtrees2(TreeNode* root) {
+    std::unordered_map&lt;std::string, int&gt; counter;
+    std::vector&lt;TreeNode*&gt; res;
+    getSubTreeSeq(root, counter, res);
+    return res;
+}
+</code></pre>
 ]]></content>
     </entry>
     <entry>
@@ -1180,249 +1498,6 @@ u:r:system_app:s0              system        23061    406 14003372 174876 0     
 <p><code>workerThread</code>函数里面循环地从队列中获取任务并执行，如果没有任务，他就会处于等待状态。可以看到这里同样有一个<code>std::atomic_bool</code>的变量<code>done_</code>，它用于使线程结束。我们会在线程池的析构函数里将这个变量设为<code>true</code>，然后我们调用队列的<code>done</code>函数，让队列退出。最后我们逐个检查线程池中的线程，如果他们还在运行，等待他们结束。<strong>一个<code>std::thread</code>在析构前必须指定等待该线程结束还是分离该线程，否则会发生错误。</strong> 如果我们不做这些工作，那么线程池在析构时要么是其中的线程一直处于等待状态，要么是一直处于循环状态，这会导致析构函数停滞不前，也就是程序的卡死。</p>
 <h2 id="五-总结">五、总结</h2>
 <p>这次实现的线程池只能说是实现了最基础的功能，还缺少一些功能，例如任务返回值的缺失等。本文实现的线程安全队列也十分简单，还有很多可以优化的地方。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Android deeplink]]></title>
-        <id>https://jsrdzhk.github.io/post/android-deeplink/</id>
-        <link href="https://jsrdzhk.github.io/post/android-deeplink/">
-        </link>
-        <updated>2021-02-20T06:52:58.000Z</updated>
-        <content type="html"><![CDATA[<p>deeplink用于将用户快速引导至对应应用的某个板块，在电商广告中使用较多，用户只需要点击广告变可以直接跳转到对应的电商APP的商品下单处，如果用户没有下载该应用，就跳转到下载页引导用户下载安装，完成新用户的转化。</p>
-<h2 id="一-具体实现">一、具体实现</h2>
-<p>在<code>Android</code>中实现<code>deeplink</code>非常简单，只需要在<code>AndroidManifest.xml</code>的<code>Activity</code>中添加以下代码即可：</p>
-<pre><code class="language-xml">&lt;intent-filter android:autoVerify=&quot;true&quot;&gt;
-  &lt;action android:name=&quot;android.intent.action.VIEW&quot; /&gt;
-
-  &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
-  &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot; /&gt;
-
-  &lt;data
-        android:scheme=&quot;http&quot;
-        android:host=&quot;medivh.top&quot;
-        android:path=&quot;/main&quot; /&gt;
-&lt;/intent-filter&gt;
-</code></pre>
-<p>此时，只需要在其他应用中使用<code>Intent(Intent.ACTION_VIEW, Uri.parse(&quot;http://medivh.top/main&quot;))</code>，并通过<code>startActivity</code>启动，即可跳转到具有以上声明的应用。</p>
-<p>除了<code>http</code>和<code>https</code>意外，还可以自定义URL的schema。</p>
-<pre><code class="language-xml">&lt;intent-filter android:label=&quot;@string/filter_test_medivh&quot;&gt;
-  &lt;action android:name=&quot;android.intent.action.VIEW&quot; /&gt;
-  &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
-  &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot; /&gt;
-  &lt;data android:scheme=&quot;medivh&quot;
-        android:host=&quot;test&quot; /&gt;
-&lt;/intent-filter&gt;
-</code></pre>
-<p>此时，使用<code>Intent(Intent.ACTION_VIEW, Uri.parse(&quot;medivh://test&quot;))</code>也可以完成应用跳转。</p>
-<p>为了跳转到预期的板块，可以在<code>Intent</code>中加入数据，<code>deeplink</code>的声明者对这些数据进行解析，完成板块的跳转。例如：</p>
-<pre><code class="language-kotlin">val jumpTpMedivhBtn: Button = findViewById(R.id.jump_to_medivh)
-jumpTpMedivhBtn.setOnClickListener {
-  val intent = Intent(Intent.ACTION_VIEW, Uri.parse(&quot;medivh://test&quot;))
-  intent.putExtra(&quot;device_info&quot;, false)
-  startActivity(intent)
-}
-</code></pre>
-<p>在A应用中发起了对B应用的跳转，并在<code>Intent</code>里面加入了一个表示是否跳转到B应用设备信息页的标识位数据。</p>
-<pre><code class="language-kotlin">val appLinkIntent = intent
-val devInfo = appLinkIntent.getBooleanExtra(&quot;device_info&quot;, true)
-if (!devInfo) {
-  Toast.makeText(this, &quot;navigate to slide show:${!devInfo}&quot;, Toast.LENGTH_SHORT).show()
-  navController.navigate(R.id.nav_slideshow)
-}
-</code></pre>
-<p>B应用在Activity的<code>onCreate</code>函数中解析收到的<code>Intent</code>，得知A应用不想跳转到默认的设备信息页面，于是使用<code>navController.navigate(R.id.nav_slideshow)</code>跳转到了其他页面。</p>
-<h2 id="二-处理顺序">二、处理顺序</h2>
-<p><code>Android</code>系统在处理<code>Uri</code>的Intent时遵循以下顺序：</p>
-<ol>
-<li>如果指定了用户的首选应用程序，则该应用程序可以处理URI。</li>
-<li>打开唯一可以处理URI的应用程序。</li>
-<li>允许用户从对话框中选择一个应用程序。</li>
-</ol>
-<p>所以，如果使用<code>http</code>或者<code>https</code>作为链接的schema，那么如果没有应用处理该Intent，<code>Android</code>系统则会调用默认浏览器来进行处理。此时，开发者就可以在这里将链接重定向到app下载地址，引导用户进行下载了。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Best practice of Python's project structure]]></title>
-        <id>https://jsrdzhk.github.io/post/best-practice-of-pythons-project-structure/</id>
-        <link href="https://jsrdzhk.github.io/post/best-practice-of-pythons-project-structure/">
-        </link>
-        <updated>2021-02-19T08:29:07.000Z</updated>
-        <content type="html"><![CDATA[<p>There's no standard answer about how to structure the python's project.I'll introduce one relatively reasonable solution.Here's the example.</p>
-<pre><code>.
-├── ChangeLog
-├── README.md
-├── build.sh
-├── build_and_install_egg.sh
-├── clean_build.sh
-├── docker
-│   ├── DockerfileTemplate
-│   ├── docker-compose-template.yaml
-│   ├── env.sh
-│   └── start.sh
-├── setup.py
-├── src
-│   └── salvage
-│       ├── __init__.py
-│       ├── configuration
-│       ├── controller
-│       ├── core
-│       ├── main.py
-│       ├── model
-│       ├── repository
-│       ├── resource
-│       ├── service
-│       └── util
-└── test
-    └── salvage
-        └── configuration
-</code></pre>
-<h2 id="1chnagelog">1.Chnagelog</h2>
-<p>Changelog is very important for a project.It records the release history of the project and helps the developer find bugs quickly.Here is the recommended example of a Changelog.</p>
-<pre><code>[1.0.0]
-* first release
-
-[0.2.1]
-* fix the deadlock problem
-
-[0.2.0]
-* add multiprocessing and improve the performance
-
-[0.1.0]
-* first commit
-</code></pre>
-<p>Normally,we often use three numbers to represent the version number.The first number tracks major changes,the second tracks minor changes,the last tracks patches or bug fix.</p>
-<h2 id="2readme">2.README</h2>
-<p><code>README</code> or <code>README.md</code> is used to introduce the basic information of the project,including :</p>
-<ul>
-<li>the purpose of the project</li>
-<li>how to run the project</li>
-<li>how to develop the project</li>
-<li>introduce the structure of the code</li>
-</ul>
-<h2 id="3build-script">3.build script</h2>
-<p>Python use wheel or egg to pack the code,we can use build script to reduce the redundant typing work.Here's the example.</p>
-<pre><code class="language-sh">#!/bin/bash
-
-python3 setup.py bdist_egg bdist_wheel
-</code></pre>
-<p>We can also use a <code>clean_build.sh</code> to clean the build products.</p>
-<pre><code class="language-sh">#!/bin/sh
-
-if [ -d build ]; then
-  rm -dr build
-fi
-if [ -d dist ]; then
-  rm -dr dist
-fi
-if [ -d src/salvage.egg-info ]; then
-  rm -dr src/salvage.egg-info
-fi
-</code></pre>
-<p>You maybe want to build and install with easy install.</p>
-<pre><code class="language-sh">#!/bin/bash
-
-source build.sh
-sudo easy_install dist/salvage-*-py3.8.egg
-source clean_build.sh
-</code></pre>
-<p>Cleaning the build products is recommended because it will influence the navigate operation of some IDE.You may modify the built python code ,not the project files.<strong>Clean save your time!</strong></p>
-<h2 id="4setuppy">4.setup.py</h2>
-<p>We always use <code>setuptools</code> as the package tools.The documentation of <code>setuptools</code> is <a href="https://setuptools.readthedocs.io/en/latest/">here</a>.I'll only give some instructions about the basic usage of this tool base on one example.</p>
-<pre><code class="language-python">#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
-import os
-import setuptools
-
-def find_version(file_name):
-    with open(file_name, encoding='utf-8') as file_handle:
-        lines = file_handle.readlines()
-        latest_version = lines[0].strip(os.linesep).rstrip(']').lstrip('[')
-        print(&quot;Salvage:&quot;, latest_version)
-        return latest_version
-
-setuptools.setup(
-    name='salvage',
-    version=find_version(&quot;./ChangeLog&quot;),
-    description='toolbox',
-    long_description='operation_toolbox',
-    long_description_content_type='text/markdown',
-    # packages=['salvage'],
-    packages=setuptools.find_packages(where='src', include=['salvage*', ]),
-    package_dir={'': 'src'},
-    install_requires=[
-        'requests',
-        'pymysql',
-        'wisbec',
-        'bottle',
-        'bottle-redis',
-        'sqlalchemy',
-        'sqlalchemy_utils',
-        'tldextract',
-        'redis'
-    ],
-    package_data={
-        '': [
-            'www/*',
-            'config/*'
-        ]
-    },
-    include_package_data=True,
-    entry_points={
-        &quot;console_scripts&quot;: [
-            &quot;salvage = salvage.main:main&quot;,
-        ]
-    },
-    python_requires='&gt;=3.7,&lt;3.9',
-    platforms=['any'],
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: Unix',
-        'Operating System :: POSIX',
-        'Operating System :: Microsoft :: Windows',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: Utilities',
-    ],
-    zip_safe=False)
-</code></pre>
-<p><code>setuptools</code> use <code>setup</code> method to make the package.We just need to specify some parameters.Here's the meaning of some important arguments.</p>
-<ul>
-<li>name:the name of the project</li>
-<li>version:the version of the project ,you can specify it each time you make changes to your project.I recommend use a simple function <code>find_version</code> to read the version number from your Changelog file.You can just cpoy the function to your <code>setup.py</code> ,feel free to use it😏!</li>
-<li>description:the description of your project .</li>
-<li>long_description:similar to description ,not important.</li>
-<li>packages:this parameter is used to specify which Python packages you want to pack.Usually ,we use <code>setuptools.find_packages</code> to find the Python packages.<code>where</code> means the package location ,<code>include</code> means package name .You can use the shell blob to represent your Python package name.Here the <code>salvage*</code> means all the Python packages which has <code>salvage</code> as the prefix .For example ,<code>salvagecore</code> and so on.You can also use <code>exclude</code> to exclude some Python packages which you do not want to include in the package.</li>
-<li>package_dir :the <code>:</code> in the example means root directory ,<code>src</code> means the Python package dir.</li>
-<li>install_requires:the dependency of the project.<code>easy_install</code> and <code>pip</code> will automatically install these packges you specifed .</li>
-<li>package_data:the resource file you want to pack .Sometimes you need to add some non-python file in your package.The <code>''</code> in the example means root directory.**Attention,these means the package root.<code>setuptools</code> will look up in all of your target packages' directories.Here is the files in <code>src</code> :<pre><code>.
-└── salvage
-    ├── __init__.py
-    ├── main.py
-    ├── resource
-    │   ├── __init__.py
-    │   ├── config
-    │   │   ├── dev.ini
-    │   │   └── release.ini
-    │   ├── runtime.py
-    │   └── www
-    │       ├── adb.bundle.js
-    │       └── index.html
-    └── util
-        └── __init__.py
-</code></pre>
-the <code>www/*</code> means pack all files in <code>www</code> directory ,so <code>adb.bundle.js</code> and <code>index.html</code> will be include in the package.</li>
-<li>include_package_data:if this parameter is <code>True</code> ,the <code>package_data</code> make sense .</li>
-<li>entry_points:this argument specify the entry point of your package.<code>console_scripts</code> means you can run the code from console after you installed the package.<code>salvage = salvage.main:main</code> means the console script name is <code>salvage</code> and the script entry point is the <code>main</code> function in salvage package's <code>main.py</code> file.Python will generate a script file on the <code>PATH</code> ,which is usually <code>/usr/local/bin</code>.</li>
-<li>python_requires:this stipulated the ranges the Python version of your packages.<code>&gt;=3.7,&lt;3.9</code> means you can use this package with Python 3.7/3.8/3.9.</li>
-<li>platform:this means the platform of your package ,<code>any</code> means all platform is compatible .</li>
-</ul>
-<h2 id="5code-structure">5.code structure</h2>
-<p>I recommend use <code>src</code> to place all of your code and <code>test</code> to place your test code.You can also use the project name to replace <code>src</code>.</p>
 ]]></content>
     </entry>
 </feed>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Git服务器添加SSH Key | Rodney Cheung&#39;s House</title>
+<title>二叉搜索树（BST） | Rodney Cheung&#39;s House</title>
 <meta name="description" content="The king is noble only for practicing his way😄!">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -81,47 +81,127 @@
       <div class="sm-12 md-8 col">
         <div class="paper">
           <article class="article">
-            <h1>Git服务器添加SSH Key</h1>
+            <h1>二叉搜索树（BST）</h1>
             <p class="article-meta">
-              2021-03-02
+              2021-07-12
               
-                <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge secondary">
-                  Git
+                <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge secondary">
+                  BST
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge warning">
+                  data structure
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge success">
+                  tree
                 </a>
               
             </p>
             
             <div class="post-content">
-              <h2 id="一-检查本机是否存在ssh-key">一、检查本机是否存在SSH key</h2>
-<p>输入以下命令：</p>
-<pre><code class="language-sh">ls -al ~/.ssh
+              <p>二叉搜索树基于二叉树，其左子树的所有节点均小于根结点，而右子树的所有节点均大于根结点，同时其左右子树又都是二叉搜索树。</p>
+<h2 id="一-二叉搜索树中的第k个最小元素">一、二叉搜索树中的第K个最小元素</h2>
+<p><a href="https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/">230. 二叉搜索树中第K小的元素 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>使用中序遍历就可以得到二叉搜索树中元素的升序排列：</p>
+<pre><code class="language-c++">void traverse(TreeNode* n, int k, int&amp; c, int&amp; res) {
+    if (!n) {
+        return;
+    }
+    traverse(n-&gt;left, k, c, res);
+    ++c;
+    if (c == k) {
+        res = n-&gt;val;
+        return;
+    } else if (c &gt; k) {
+        return;
+    } else {
+        traverse(n-&gt;right, k, c, res);
+    }
+}
+
+int kthSmallest(TreeNode* root, int k) {
+    int res = 0, c = 0;
+    traverse(root, k, c, res);
+    return res;
+}
 </code></pre>
-<p>如果没有类似<code>id_rsa.pub</code>、<code>id_ecdsa.pub</code>和<code>id_ed25519.pub</code>这样的文件，说明就需要生成新的SSH key。</p>
-<h2 id="二-生成ssh-key">二、生成SSH key</h2>
-<ol>
-<li><code>ssh-keygen -t rsa -b 4096 -C &quot;your_email@example.com&quot;</code></li>
-<li>接着会提示输入key保存位置和输入安全密码短语，直接回车使用默认值即可</li>
-</ol>
-<h2 id="三-启动ssh-agent">三、启动ssh-agent</h2>
-<ol>
-<li><code>eval &quot;$(ssh-agent -s)&quot;</code></li>
-<li>将生成的密钥加入到ssh中:<code>ssh-add ~/.ssh/id_rsa</code></li>
-</ol>
-<h2 id="四-将ssh-key添加到github">四、将SSH key添加到github</h2>
-<ol>
-<li>输出SSH key内容并拷贝<pre><code class="language-shell">cat ~/.ssh/id_rsa.pub
+<p>当每次读取bst中的序列时，都自增计数器：</p>
+<ul>
+<li>当计数器等于要求的值时，保存结果；</li>
+<li>当计数器小于要求的值时，继续读取；</li>
+<li>当计数器大雨要求的值时，从递归中跳出。</li>
+</ul>
+<h2 id="二-把二叉搜索树转化为累加树">二、把二叉搜索树转化为累加树</h2>
+<p><a href="https://leetcode-cn.com/problems/convert-bst-to-greater-tree/">538. 把二叉搜索树转换为累加树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>根据题意，累加树就是使每个节点 <code>node</code> 的新值等于原树中大于或等于 <code>node.val</code> 的值之和，简单来说就是将二叉搜索树中所有节点的值都增加该节点右子树所有节点之和。</p>
+<p>中序遍历二叉搜索树最后才能访问到右子树，此时我们倒过来。先访问树的右子树，使用一个变量记录当前的右子树之和，然后将该变量加到树的根结点上，再访问左子树:</p>
+<pre><code class="language-c++">void traverseBst(TreeNode* n, int&amp; sum) {
+    if (!n) {
+        return;
+    }
+    traverseBst(n-&gt;right, sum);
+    n-&gt;val = n-&gt;val += sum;
+    sum = n-&gt;val;
+    traverseBst(n-&gt;left, sum);
+}
+
+TreeNode* bstToGst(TreeNode* root) {
+    int sum = 0;
+    traverseBst(root, sum);
+    return root;
+}
 </code></pre>
-</li>
-<li>粘贴到github账户的<code>Setting-&gt;SSH and GPG keys-&gt;New SSH key</code>中。</li>
-</ol>
-<h2 id="五-troubleshooting">五、troubleshooting</h2>
-<ol>
-<li><code>Unable to negotiate with xxx.xxx.xxx.xxx port 22: no matching key exchange method found. Their offer: diffie-hellman-group1-sha1</code><br>
-在~/.ssh/config中加入以下内容:<pre><code>Host *
-    KexAlgorithms +diffie-hellman-group1-sha1
+<h2 id="三-不同的二叉搜索树">三、不同的二叉搜索树</h2>
+<p><a href="https://leetcode-cn.com/problems/unique-binary-search-trees/">96. 不同的二叉搜索树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>当固定某个值<code>a</code>为根结点时，其左侧的值为<code>[1,a-1]</code>，右侧的值为<code>[a+1,n]</code>，定义<code>f(n)</code>为n个不同的数组成的二叉搜索树的种类，那么此时:</p>
+<pre><code>f(n)=f(a-1-1+1)+f(n-(a+1)+1)
 </code></pre>
-</li>
-</ol>
+<p>由此将求得<code>[1,n]</code>二叉搜索树的种类分解为了两个子问题，而当n=1或者0时，<code>f(n)</code>的结果显然为<code>1</code>，由此可以推断出：</p>
+<pre><code>f(2)=f(1)*f(0)+f(0)*f(1)=2
+f(3)=f(2)*f(0)+f(1)*f(1)+f(0)*f(2)=5
+...
+</code></pre>
+<p>代码如下：</p>
+<pre><code class="language-c++">int numTrees(int n) {
+    std::vector&lt;int&gt; dp{1, 1};
+    for (auto i = 2; i &lt;= n; ++i) {
+        dp.push_back(0);
+        for (auto j = 0; j &lt; i; ++j) {
+            dp[i] += dp[j] * dp[i - 1 - j];
+        }
+    }
+    return dp[n];
+}
+</code></pre>
+<h2 id="四-不同的二叉搜索树二">四、不同的二叉搜索树（二）</h2>
+<p><a href="https://leetcode-cn.com/problems/unique-binary-search-trees-ii/submissions/">95. 不同的二叉搜索树 II - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<pre><code class="language-c++">std::vector&lt;TreeNode*&gt; constructBst(int s, int e) {
+    std::vector&lt;TreeNode*&gt; res;
+    if (s &gt; e) {
+        res.push_back(nullptr);
+        return res;
+    }
+    for (auto i = s; i &lt;= e; ++i) {
+        auto leftRes = constructBst(s, i - 1);
+        auto rightRes = constructBst(i + 1, e);
+        for (auto l : leftRes) {
+            for (auto r : rightRes) {
+                TreeNode* node = new TreeNode(i);
+                node-&gt;left = l;
+                node-&gt;right = r;
+                res.push_back(node);
+            }
+        }
+    }
+    return res;
+}
+
+std::vector&lt;TreeNode*&gt; generateTrees(int n) {
+    return constructBst(1, n);
+}
+</code></pre>
+<p>对于每一次递归，都会计算当前递归层次所有的左右子树可构建的二叉搜索树的根结点。</p>
 
             </div>
           </article>
@@ -132,9 +212,9 @@
               <div class="next">
                 Next Blog
               </div>
-              <a href="https://jsrdzhk.github.io/post/jian-dan-de-xian-cheng-chi-shi-xian/">
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">
                 <h3 class="post-title">
-                  简单的线程池实现
+                  Git基础(一)
                 </h3>
               </a>
             </div>
@@ -255,7 +335,7 @@
     </div>
     <div class="row">
       
-        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge ">
           Graph
         </a>
       
@@ -263,15 +343,15 @@
           data structure
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge ">
           BST
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge secondary">
           tree
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge warning">
           Git
         </a>
       
@@ -279,19 +359,19 @@
           docker
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge secondary">
           proxy
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
           Android
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge ">
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge warning">
           cpp
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge secondary">
           Kotlin
         </a>
       
