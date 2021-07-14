@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Android | Rodney Cheung&#39;s House</title>
+<title>链表相关 | Rodney Cheung&#39;s House</title>
 <meta name="description" content="The king is noble only for practicing his way😄!">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,6 +23,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House</a></h3>
@@ -79,68 +80,126 @@
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
-          <h2 class="current-tag">标签: Android</h2>
-          
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://jsrdzhk.github.io/post/android-appxi-tong-qian-ming/">Android app系统签名</a>
-    </h2>
-    <p class="article-meta">
-      2021-06-29
-      
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge ">
-          Android
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://jsrdzhk.github.io/post/android-appxi-tong-qian-ming/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
+          <article class="article">
+            <h1>链表相关</h1>
+            <p class="article-meta">
+              2021-07-14
+              
+                <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge secondary">
+                  LinkedList
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+                  data structure
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="一-定义">一、定义</h2>
+<p>单向链表：</p>
+<pre><code class="language-c++">struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+</code></pre>
+<h2 id="二-反转链表">二、反转链表</h2>
+<p><a href="https://leetcode-cn.com/problems/reverse-linked-list/">206. 反转链表 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h3 id="21-迭代写法">2.1 迭代写法</h3>
+<pre><code class="language-c++">ListNode* iterationReverseList(ListNode* head) {
+    if (!head || !head-&gt;next) {
+        return head;
+    }
+    ListNode* prev = nullptr;
+    while (head) {
+        ListNode* next = head-&gt;next;
+        head-&gt;next = prev;
+        prev = head;
+        head = next;
+    }
+    return head;
+}
+</code></pre>
+<h3 id="22-递归写法">2.2 递归写法</h3>
+<pre><code class="language-c++">ListNode* recursiveReverseList(ListNode* head) {
+    if (!head || !head-&gt;next) {
+        return head;
+    }
+    ListNode* last = recursiveReverseList(head-&gt;next);
+    head-&gt;next-&gt;next = head;
+    head-&gt;next = nullptr;
+    return last;
+}
+</code></pre>
+<h2 id="三-判断链表是否是回文">三、判断链表是否是回文</h2>
+<p><a href="https://leetcode-cn.com/problems/palindrome-linked-list/submissions/">234. 回文链表 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>如果不要求空间复杂度，可以直接将链表所有值都读取到数组中，并使用双指针判断是否是回文。如果要求空间复杂度为<code>O(1)</code>，那么则需要利用快慢指针找到链表的中点，并反转剩下的一半链表，然后逐一判断每个节点的值是否相等：</p>
+<pre><code class="language-c++">ListNode* reverseBetween(ListNode* s, ListNode* e) {
+    ListNode *cur = s, *next = s;
+    ListNode* prev = nullptr;
+    while (cur != e) {
+        next = cur-&gt;next;
+        cur-&gt;next = prev;
+        prev = cur;
+        cur = next;
+    }
+    return prev;
+}
 
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://jsrdzhk.github.io/post/android-deeplink/">Android deeplink</a>
-    </h2>
-    <p class="article-meta">
-      2021-02-20
-      
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
-          Android
-        </a>
-      
-        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge success">
-          Kotlin
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://jsrdzhk.github.io/post/android-deeplink/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
+bool isPalindrome(ListNode* head) {
+    if (!head) {
+        return false;
+    }
+    if (!head-&gt;next) {
+        return true;
+    }
+    ListNode *slow = head, *fast = head;
+    while (fast &amp;&amp; fast-&gt;next) {
+        slow = slow-&gt;next;
+        fast = fast-&gt;next-&gt;next;
+    }
+    ListNode *s = nullptr, *e = nullptr;
+    if (fast) {
+        s = slow-&gt;next;
+    } else {
+        s = slow;
+    }
+    ListNode* newHead = reverseBetween(s, e);
+    while (head &amp;&amp; newHead) {
+        if (head-&gt;val != newHead-&gt;val) {
+            return false;
+        } else {
+            head = head-&gt;next;
+            newHead = newHead-&gt;next;
+        }
+    }
+    return true;
+}
+</code></pre>
 
-
+            </div>
+          </article>
         </div>
-        <div class="row flex-edges">
-  
-  
-</div>
-
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">
+                <h3 class="post-title">
+                  图相关
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
       </div>
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://jsrdzhk.github.io/images/avatar.png?v=1626231031125" class="no-responsive avatar">
@@ -259,27 +318,27 @@
           LinkedList
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge warning">
           data structure
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge success">
           Graph
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge secondary">
           BST
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge warning">
           tree
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge ">
           Git
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge ">
           docker
         </a>
       
@@ -287,11 +346,11 @@
           proxy
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
           Android
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge warning">
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge success">
           cpp
         </a>
       
@@ -299,7 +358,7 @@
           Kotlin
         </a>
       
-        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge success">
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge warning">
           Python
         </a>
       
@@ -309,6 +368,7 @@
     Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
   </div>
 </div>
+
 
     </div>
 
