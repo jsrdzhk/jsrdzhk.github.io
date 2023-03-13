@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>写给开发者Kotlin指引（二） | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>写给开发者Kotlin指引（二）</h1>
+            <p class="article-meta">
+              2021-02-19
+              
+                <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge secondary">
+                  Kotlin
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p><a href="/post/xie-gei-kai-fa-zhe-kotlin-zhi-yin-yi">上一篇</a>说明了<code>Kotlin</code>的基本语法，本节将深入讲解lambda函数，这是<code>Kotlin</code>中使用最频繁的进阶技巧。</p>
+<h2 id="一-lambda函数">一、Lambda函数</h2>
+<h3 id="11-基本用法">1.1 基本用法</h3>
+<p>Lambda函数对于<code>C++</code>开发者或者<code>Python</code>不用多解释了，<code>Java</code>目前也加入了<code>Lambda</code>的支持。简单来说，Lambda函数就是匿名函数，他可以将函数当成参数传入其他的函数调用中。在C语言中，通过函数指针来实现了这一功能，而在C++中，除了兼容C的函数指针外，还引入了<code>std::function</code>的标准库支持，另外在Modern C++中还加入了lambda的支持。得益于C++丰富的语意支持，lambda函数的功能异常的丰富，但是也加大了使用的难度。</p>
+<p>在<code>Kotlin</code>中，lambda函数的语法非常简单：</p>
+<pre><code class="language-kotlin">{param1:param1Type param2:param2Type -&gt; functionImplementation}
+</code></pre>
+<p>现在通过一个例子说明lambda函数的用法，假设我们需要找到一个字符串数组中长度最大的一个字符串:</p>
+<pre><code class="language-kotlin">fun sortArray(): String? {
+    val list = listOf(&quot;zaabb&quot;, &quot;aa&quot;, &quot;aaazz&quot;)
+    val lambdaFunc = { s: String -&gt; s.length }
+    return list.maxByOrNull(lambdaFunc)
+}
+</code></pre>
+<p>这里仔细讲解一下，该函数的返回值是<code>String</code>，后面的<code>?</code>表示该函数可能返回一个<code>null</code>值，<code>listOf</code>的定义如下:</p>
+<pre><code class="language-kotlin">public fun &lt;T&gt; listOf(vararg elements: T): List&lt;T&gt; = if (elements.size &gt; 0) elements.asList() else emptyList()
+</code></pre>
+<p>它是一个泛型函数，我们在调用时需要提供一个类型<code>T</code>，该类型就是<code>listOf</code>函数的参数类型，<code>vararg</code>表示变长参数，我们可以在这里提供多个<code>T</code>类型的参数。我们在调用时的标准写法应该是<code>listOf&lt;String&gt;(&quot;zaabb&quot;, &quot;aa&quot;, &quot;aaazz&quot;)</code>，但是泛型函数拥有推断能力，由于我们提供的三个参数都是<code>String</code>类型，所以在调用时可以省略<code>&lt;&gt;</code>。该函数的函数体很简单，就是将边长参数的所有<code>elements</code>转化为一个<code>List&lt;T&gt;</code>。</p>
+<p><code>List&lt;T&gt;</code>拥有一个<code>maxByOrNull</code>的方法，来看它的定义：</p>
+<pre><code class="language-kotlin">@SinceKotlin(&quot;1.4&quot;)
+public inline fun &lt;T, R : Comparable&lt;R&gt;&gt; Iterable&lt;T&gt;.maxByOrNull(selector: (T) -&gt; R): T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var maxElem = iterator.next()
+    if (!iterator.hasNext()) return maxElem
+    var maxValue = selector(maxElem)
+    do {
+        val e = iterator.next()
+        val v = selector(e)
+        if (maxValue &lt; v) {
+            maxElem = e
+            maxValue = v
+        }
+    } while (iterator.hasNext())
+    return maxElem
+}
+</code></pre>
+<p>这是一个内联函数，这个概念在C++中同样存在，就是会将函数在调用处完全展开（C++也不一定会完全展开，编译器会做一些判断，不过用户可以通过一些编译器选项来强制展开）。<code>&lt;T, R : Comparable&lt;R&gt;&gt;</code>指定了该函数在调用时需要提供哪些类型，而<code>R : Comparable&lt;R&gt;</code>表示第二个类型<code>R</code>的类型必须是<code>Comparable&lt;R&gt;</code>的子类。<code>Iterable&lt;T&gt;.</code>表示<code>maxByOrNull</code>函数是<code>Iterable&lt;T&gt;</code>的一个扩展函数。扩展函数是<code>Kotlin</code>中的一个新概念，旨在减少<code>Util</code>类的使用。因为<code>Iterable&lt;T&gt;</code>本身没有定义<code>maxByOrNull</code>方法，所以只要在这里补充定义一下，那么就等于<code>Iterable&lt;T&gt;</code>中定义了一个<code>public</code>的成员方法。接下来分析该函数的参数，<code>selector</code>的类型看上去跟<code>lambda</code>函数的语法非常相似，其实确实是这样，括号中表示该函数接受的参数，为<code>T</code>,而<code>R</code>则表示该函数的返回类型，也就是一个<code>Comparable&lt;R&gt;</code>对象。最后的返回类型是<code>T?</code>，表示返回的可能是<code>T</code>类型的变量，也有可能是个<code>null</code>。</p>
+<p>在分析函数体之前，先想一下为什么<code>List&lt;T&gt;</code>类型的对象能够调用<code>Iterable&lt;T&gt;</code>的扩展函数<code>maxByOrNull</code>？根据我们对面向对象的理解，猜测<code>List</code>应该是<code>Iterable</code>的子类，通过追踪<code>Kotlin</code>源代码，发现<code>List</code>继承于<code>Collection</code>类，而<code>Collection</code>类继承于<code>Iterable</code>类，说明<code>List</code>是可迭代的。</p>
+<p>下面看函数体，第一行调用了<code>iterator()</code>,它的定义是：<code>public operator fun iterator(): Iterator&lt;T&gt;</code>，用于返回一个可迭代对象的迭代器，<code>operator</code>用于标记该函数是一个可重载的运算符函数，这里暂时不细说。<code>iterator</code>有几个成员函数，用于在可迭代对象中移动迭代器。其中<code>hasNext</code>用于判断迭代器是否挪到了终点，而<code>next</code>则指使迭代器挪到可迭代对象中的下一个元素上。这种模式在C++中经常在代码层使用，所以C++开发者应该能够轻易理解这里的意思。不理解的，可以认为就是一个for循环对于<code>List</code>的遍历。了解了这些细节之后，函数的逻辑就很好理解了，就是通过遍历<code>List</code>中的所有元素，并通过<code>selector</code>函数将这些元素都转化为<code>Comparable&lt;R&gt;</code>对象，然后使用<code>&lt;</code>来比较他们的大小，并将大的暂时存储到一个临时变量中，整个算法的复杂度是<code>O(N)</code>。顺便提一下，<code>Comparable&lt;R&gt;</code>中的<code>&lt;</code>号也是一个<code>operator</code>，这就涉及到运算符重载的问题，C++开发者应该能很快领悟其中的奥妙。</p>
+<h3 id="12-简化调用">1.2 简化调用</h3>
+<p>其实<code>lambda</code>函数的调用并不需要先声明出来，所以，上面的代码可以简化为:</p>
+<pre><code class="language-kotlin">fun sortArray(): String? {
+    val list = listOf(&quot;zaabb&quot;, &quot;aa&quot;, &quot;aaazz&quot;)
+    return list.maxByOrNull({ s: String -&gt; s.length })
+}
+</code></pre>
+<p><code>Kotlin</code>还规定，当函数的参数的最后一个参数是函数时，可以将函数参数挪到外面：</p>
+<pre><code class="language-kotlin">fun sortArray(): String? {
+    val list = listOf(&quot;zaabb&quot;, &quot;aa&quot;, &quot;aaazz&quot;)
+    return list.maxByOrNull(){ s: String -&gt; s.length }
+}
+</code></pre>
+<p>当函数只有一个参数，且该参数是函数时，可以省略调函数调用符号，也就是括号：</p>
+<pre><code class="language-kotlin">fun sortArray(): String? {
+    val list = listOf(&quot;zaabb&quot;, &quot;aa&quot;, &quot;aaazz&quot;)
+    return list.maxByOrNull{ s: String -&gt; s.length }
+}
+</code></pre>
+<p>由于类型推导的存在，我们同样也可以省略<code>s</code>后面的参数类型:</p>
+<pre><code class="language-kotlin">fun sortArray(): String? {
+    val list = listOf(&quot;zaabb&quot;, &quot;aa&quot;, &quot;aaazz&quot;)
+    return list.maxByOrNull{ s -&gt; s.length }
+}
+</code></pre>
+<p>最后，如果作为参数的函数签名只有一个参数，那么连前面的参数名都可以省略，直接用<code>it</code>代替即可：</p>
+<pre><code class="language-kotlin">fun sortArray(): String? {
+    val list = listOf(&quot;zaabb&quot;, &quot;aa&quot;, &quot;aaazz&quot;)
+    return list.maxByOrNull{ it.length }
+}
+</code></pre>
+<h2 id="二-总结">二、总结</h2>
+<p><code>lambda</code>函数大大简化了开发中的冗余代码，而<code>Kotlin</code>的简洁高效也开始初步展现。(C++:什么叫编程语言的皇冠啊😄)</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/xie-gei-kai-fa-zhe-kotlin-zhi-yin-yi/">
+                <h3 class="post-title">
+                  写给开发者Kotlin指引（一）
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge ">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge secondary">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge warning">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge success">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge secondary">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge success">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge secondary">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge warning">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge success">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge warning">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge ">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

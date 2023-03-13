@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>理解C++中的左值和右值 | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>理解C++中的左值和右值</h1>
+            <p class="article-meta">
+              2021-07-15
+              
+                <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge success">
+                  cpp
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="一-前言">一、前言</h2>
+<p>一直以来，我都对C++中左值（lvalue）和右值（lvalue）的概念模糊不清。我认为是时候好好理解他们了，因为这些概念随着C++语言的进化变得越来越重要。</p>
+<h2 id="二-左值和右值一个友好的定义">二、左值和右值——一个友好的定义</h2>
+<p>首先，让我们避开那些正式的定义。在C++中，一个左值是指向一个指定内存的东西。另一方面，右值就是不指向任何地方的东西。通常来说，右值是暂时和短命的，而左值则活的很久，因为他们以变量的形式（variable）存在。我们可以将左值看作为容器（container）而将右值看做容器中的事物。如果容器消失了，容器中的事物也就自然就无法存在了。<br>
+让我们现在来看一些例子：</p>
+<pre><code class="language-cpp">int x = 666; //ok
+</code></pre>
+<p>在这里，<code>666</code>是一个右值。一个数字（从技术角度来说他是一个字面常量（literal constant））没有指定的内存地址，当然在程序运行时一些临时的寄存器除外。在该例中，<code>666</code>被赋值（assign）给<code>x</code>，<code>x</code>是一个变量。一个变量有着具体（specific）的内存位置，所以他是一个左值。C++中声明一个赋值（assignment）需要一个左值作为它的左操作数（left operand）：这完全合法。<br>
+对于左值<code>x</code>，你可以做像这样的操作：</p>
+<pre><code class="language-cpp">int* y = &amp;x;  //ok
+</code></pre>
+<p>在这里我通过取地址操作符<code>&amp;</code>获取了<code>x</code>的内存地址并且把它放进了<code>y</code>。<code>&amp;</code>操作符需要一个左值并且产生了一个右值，这也是另一个完全合法的操作：在赋值操作符的左边我们有一个左值（一个变量），在右边我们使用取地址操作符产生的右值。<br>
+然而，我们不能这样写：</p>
+<pre><code class="language-cpp">int y;
+666 = y; //error!
+</code></pre>
+<p>可能上面的结论是显而易见的，但是从技术上来说是因为<code>666</code>是一个字面常量也就是一个右值，它没有一个具体的内存位置（memory location），所以我们会把<code>y</code>分配到一个不存在的地方。<br>
+下面是GCC给出的变异错误提示：</p>
+<blockquote>
+<p>error: lvalue required as left operand of assignment</p>
+</blockquote>
+<p>赋值的左操作数需要一个左值，这里我们使用了一个右值<code>666</code>。<br>
+我们也不能这样做：</p>
+<pre><code class="language-cpp">int* y = &amp;666;//   error~
+</code></pre>
+<p>GCC给出了以下错误提示：</p>
+<blockquote>
+<p>error: lvalue required as unary '&amp;' operand`</p>
+</blockquote>
+<p><code>&amp;</code>操作符需要一个左值作为操作数，因为只有一个左值才拥有地址。</p>
+<h2 id="三-返回左值和右值的函数">三、返回左值和右值的函数</h2>
+<p>我们知道一个赋值的左操作数必须是一个左值，因此下面的这个函数肯定会抛出错误：<code>lvalue required as left operand of assignment</code></p>
+<pre><code class="language-cpp">int setValue()
+{
+    return 6;
+}
+
+// ... somewhere in main() ...
+
+setValue() = 3; // error!
+</code></pre>
+<p>错误原因很清楚：<code>setValue()</code>返回了一个右值（一个临时值<code>6</code>），他不能作为一个赋值的左操作数。现在，我们看看如果函数返回一个左值，这样的赋值会发生什么变化。看下面的代码片段（snippet）：</p>
+<pre><code class="language-cpp">int global = 100;
+
+int&amp; setGlobal()
+{
+    return global;    
+}
+
+// ... somewhere in main() ...
+
+setGlobal() = 400; // OK
+</code></pre>
+<p>该程序可以运行，因为在这里<code>setGlobal()</code>返回一个引用（reference），跟之前的<code>setValue()</code>不同。一个引用是指向一个已经存在的内存位置（<code>global</code>变量）的东西，因此它是一个左值，所以它能被赋值。注意这里的<code>&amp;</code>：它不是取地址操作符，他定义了返回的类型（一个引用）。<br>
+可以从函数返回左值看上去有些隐晦，它在你做一些进阶的编程例如实现一些操作符的重载（implementing overload operators）时会很有作用，这些知识会在未来的章节中讲述。</p>
+<h2 id="四-左值到右值的转换">四、左值到右值的转换</h2>
+<p>一个左值可以被转换（convert）为右值，这完全合法且经常发生。让我们先用<code>+</code>操作符作为一个例子，根据C++的规范（specification），它使用两个右值作为参数并返回一个右值（译者按：可以将操作符理解为一个函数）。<br>
+让我们看下面的代码片段：</p>
+<pre><code class="language-cpp">int x = 1;
+int y = 3;
+int z = x + y;   // ok
+</code></pre>
+<p>等一下，<code>x</code>和<code>y</code>是左值，但是加法操作符需要右值作为参数：发生了什么？答案很简单：<code>x</code>和<code>y</code>经历了一个隐式（implicit）的左值到右值（lvalue-to-rvalue）的转换。许多其他的操作符也有同样的转换——减法、加法、除法等等。</p>
+<h2 id="五-左值引用">五、左值引用</h2>
+<p>相反呢？一个右值可以被转化为左值吗？不可以，它不是技术所限，而是C++编程语言就是那样设计的。<br>
+在C++中，当你做这样的事：</p>
+<pre><code class="language-cpp">int y = 10;
+int&amp; yref = y;
+yref++;        // y is now 11
+</code></pre>
+<p>这里将<code>yref</code>声明为类型<code>int&amp;</code>：一个对<code>y</code>的引用，它被称作左值引用（lvalue reference）。现在你可以开心地通过该引用改变<code>y</code>的值了。<br>
+我们知道，一个引用必须只想一个具体的内存位置中的一个已经存在的对象，即一个左值。这里<code>y</code>确实存在，所以代码运行完美。<br>
+现在，如果我缩短整个过程，尝试将<code>10</code>直接赋值给我的引用，并且没有任何对象持有该引用，将会发生什么？</p>
+<pre><code class="language-cpp">int&amp; yref = 10;  // will it work?
+</code></pre>
+<p>在右边我们有一个临时值，一个需要被存储在一个左值中的右值。在左边我们有一个引用（一个左值），他应该指向一个已经存在的对象。但是<code>10</code> 是一个数字常量（numeric constant），也就是一个左值，将它赋给引用与引用所表述的精神冲突。<br>
+如果你仔细想想，那就是被禁止的从右值到左值的转换。一个<code>volitile</code>的数字常量（右值）如果想要被引用，需要先变成一个左值。如果那被允许，你就可以通过它的引用来改变数字常量的值。相当没有意义，不是吗？更重要的是，一旦这些值不再存在这些引用该指向哪里呢？<br>
+下面的代码片段同样会发生错误，原因跟刚才的一样：</p>
+<pre><code class="language-cpp">void fnc(int&amp; x)
+{
+}
+
+int main()
+{
+    fnc(10);  // Nope!
+    // This works instead:
+    // int x = 10;
+    // fnc(x);
+}
+</code></pre>
+<p>我将一个临时值<code>10</code>传入了一个需要引用作为参数的函数中，产生了将右值转换为左值的错误。这里有一个解决方法（workaround），创造一个临时的变量来存储右值，然后将变量传入函数中（就像注释中写的那样）。将一个数字传入一个函数确实不太方便。</p>
+<h2 id="六-常量左值引用">六、常量左值引用</h2>
+<p>先看看GCC对于之前两个代码片段给出的错误提示：</p>
+<blockquote>
+<p>error: invalid initialization of non-const reference of type 'int&amp;' from an rvalue of type 'int'</p>
+</blockquote>
+<p>GCC认为引用不是<code>const</code>的，即一个常量。根据C++规范，你可以将一个<code>const</code>的左值绑定到一个右值上，所以下面的代码可以成功运行：</p>
+<pre><code class="language-cpp">const int&amp; ref = 10;  // OK!
+</code></pre>
+<p>当然，下面的也是：</p>
+<pre><code class="language-cpp">void fnc(const int&amp; x)
+{
+}
+
+int main()
+{
+    fnc(10);  // OK!
+}
+</code></pre>
+<p>背后的道理是相当直接的，字面常量<code>10</code>是<code>volatile</code>的并且会很快失效（expire），所以给他一个引用是没什么意义的。如果我们让引用本身变成常量引用，那样的话该引用指向的值就不能被改变了。现在右值被修改的问题被很好地解决了。同样，这不是一个技术限制，而是C ++人员为避免愚蠢麻烦所作的选择。<br>
+<em>应用：C++中经常通过常量引用来将值传入函数中，这避免了不必要的临时对象的创建和拷贝。</em><br>
+编译器会为你创建一个隐藏的变量（即一个左值）来存储初始的字面常量，然后将隐藏的变量绑定到你的引用上去。那跟我之前的一组代码片段中手动完成的是一码事，例如：</p>
+<pre><code class="language-cpp">// the following...
+const int&amp; ref = 10;
+
+// ... would translate to:
+int __internal_unique_name = 10;
+const int&amp; ref = __internal_unique_name;
+</code></pre>
+<p>现在你的引用指向了真实存在的事物（知道它走出作用域外）并且你可以正常使用它，出克改变他指向的值。</p>
+<pre><code class="language-cpp">const int&amp; ref = 10;
+std::cout &lt;&lt; ref &lt;&lt; &quot;\n&quot;;   // OK!
+std::cout &lt;&lt; ++ref &lt;&lt; &quot;\n&quot;; // error: increment of read-only reference ‘ref’
+</code></pre>
+<h2 id="七-结论">七、结论</h2>
+<p>理解左值和右值的含义让我弄清楚了几个C++内在的工作方式。C++11进一步推动了右值的限定，引入了右值引用（rvalue reference）和移动（move semantics）的概念。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">
+                <h3 class="post-title">
+                  简单的shared_ptr实现
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge secondary">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge warning">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge success">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge success">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge secondary">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge ">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge warning">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge warning">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge warning">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge ">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

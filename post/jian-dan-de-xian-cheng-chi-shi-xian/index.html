@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>简单的线程池实现 | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>简单的线程池实现</h1>
+            <p class="article-meta">
+              2021-02-20
+              
+                <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge warning">
+                  cpp
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="一-为什么需要线程池">一、为什么需要线程池？</h2>
+<p>当我们需要完成一些持续时间短、发生频率高的工作时，每次为他们开启一个线程既显得繁琐又会造成不必要的开销，所以为这一类工作写一个简单的线程池就很有必要了。</p>
+<h2 id="二-如何设计我们的线程池">二、如何设计我们的线程池？</h2>
+<p>考虑这样一个应用场景，我们有一个设计软件，当我们需要下载一些模板用作接下来的设计工作。我们显然不能将下载工作放在主线程去完成，如果你的用户网络速度飞快还好说，一旦他的网络稍有波动，你的设计软件将会停止GUI界面的渲染，卡在那边不懂，这显然不是好的体验。正确的做法是另外开启一个线程去下载，一旦这个下载工作完成后，我们可以通知主线程去做一个提示，例如弹出一个对话框告诉用户模板已经可以用了。</p>
+<p>如果这个设计软件需要频繁的做下载工作，那么每次单开一个线程就比较麻烦。我们可以将下载任务打包好，一个一个的推送到队列中，由线程池自动从队列中获取任务，完成下载工作。当队列为空时，线程池里面的线程就进入等待状态，这也不会造成资源的占用。</p>
+<h2 id="三-先完成队列的设计">三、先完成队列的设计</h2>
+<p>STL中提供了一个关于队列的实现<code>std::queue</code>，但是<code>std::queue</code>并不是线程安全的，我们需要在此基础上进行一些包装，让它在多线程的情况下也可以使用。<br>
+我们的队列需要拥有这几个功能：</p>
+<ol>
+<li>从队列里弹出一个任务</li>
+<li>向队列里推送任务</li>
+<li>了解队列里的任务还有多少个</li>
+<li>清除任务队列</li>
+</ol>
+<p>下面是一个简单的线程安全队列：</p>
+<pre><code class="language-c++">namespace multi_thread {
+	template&lt;typename Task&gt;
+	class thread_safe_queue {
+	public:
+		thread_safe_queue() :done_(false) {
+
+		}
+
+		void push(const Task&amp; t) {
+			std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+			queue_.push(t);
+			ready_.notify_one();
+		}
+
+		void wait_and_pop(Task&amp; t) {
+			std::unique_lock&lt;std::mutex&gt; lock(mtx_);
+			if (queue_.empty() &amp;&amp; !done_)
+				ready_.wait(lock);
+			if (done_)
+				return;
+			t = queue_.front();
+			queue_.pop();
+		}
+
+		bool empty()const {
+			std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+			return queue_.empty();
+		}
+
+		void clear() {
+			std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+			for (int i = 0; i &lt; queue_.size(); ++i)
+				queue_.pop();
+		}
+
+		void done() {
+			done_ = true;
+			ready_.notify_all();
+		}
+	private:
+		std::queue&lt;Task&gt; queue_;
+		mutable std::mutex mtx_;
+		std::condition_variable ready_;
+		std::atomic_bool done_;
+	};
+}
+</code></pre>
+<p>简单讲解一下：</p>
+<p>我们的线程安全队列<code>thread_safe_queue</code>遵循了STL的命名规范，对于任意容器，他们的判断为空的函数签名都是<code>bool empty()const;</code>，清除容器中的内容的都为<code>void clear()</code>。对于推入任务的函数，我们跟<code>std::queue</code>保持了一致，而弹出函数的命名我们做了一些改变，与函数的操作更加切合，表示对<code>std::queue::pop()</code>的一种扩展。</p>
+<p>这里我们采用了<code>std::mutex</code>作为我们的互斥量，每次访问队列中的内容时，都用<code>std::lock_guard</code>或者<code>std::unique_lock</code>加锁，保证在同一时段只有一个线程可以读写队列。<code>std::lock_guard</code>是一个方便的RAII的体现，他会在析构时自动调用<code>unlock()</code>，<code>std::unique_lock</code>与之的区别就是，你可以显式调用<code>unlock()</code>函数完成解锁，它更加的灵活，当然你可以用<code>{}</code>和<code>std::lock_guard</code>完成相同的工作。我们将<code>std::mutex_</code>设计成<code>mutable</code>，是因为我们需要在const member function<code>empty()</code>中使用它。</p>
+<p>在<code>push</code>函数中，每次完成push后就调用<code>std::conditional_variable::notify_one()</code>来唤醒一个处于等待状态的线程，通知他队列中已经有任务了，可以开始弹出了。在对应了<code>wait_and_pop</code>函数中，同样有一个<code>std::conditional_variable::wait()</code>，这个函数可以传入一个或者两个参数，第一个参数表示要释放的锁，第二个函数是一个predicate，不接受参数，返回值为<code>bool</code>。他会在调用<code>wait</code>时首先调用这个predicate，如果值是<code>true</code>，那么就会重新获得锁并继续向下执行，如果值是<code>false</code>，他会释放锁并且进入等待状态，直到接收到前面所说的唤醒通知，他才会重新检查predicate并做前述操作。这里我们没有使用predicate，仅使用了简单的版本，他会在接收到唤醒通知时直接向下执行。</p>
+<p>再来看最后一个变量<code>std::atomic_bool</code>，它是标准库提供的一个原子类型，在访问时标准保证在同一时刻只有一个线程在读写他。原子类型是不可拷贝且不可移动的，所以我们不能对他进行类内初始化，这会调用copy constructor，正确的方法是使用constructor initializer list进行初始化，当然你也可以在构造函数体内使用赋值运算符给其赋上一个值，但是请务必在这两个中间选择一个。回到代码，这个变量的作用很简单，就是让弹出的函数<code>wait_and_pop</code>直接结束，我们只有在需要析构这个线程池时才会这么做，具体做法在线程池中细说。</p>
+<h2 id="四-完成线程池的设计">四、完成线程池的设计</h2>
+<p>在启用线程池时，我们需要指定在线程池中存放的线程的数量，当然我们也可以在后续为线程池添加新的线程。</p>
+<p>我们将使用STL提供的容器<code>std::vector</code>来存放我们的线程，这些线程做的工作都是一致的，他们将在队列中不断地弹出任务并执行它，如果队列中没有任务了，他们就将进入等待状态。</p>
+<p>结合上面的队列实现，给出一个简单的线程池实现：</p>
+<pre><code class="language-cpp">namespace multi_thread {
+	template&lt;typename Task&gt;
+	class thread_safe_queue {
+	public:
+		thread_safe_queue() :done_(false) {
+
+		}
+
+		void push(const Task&amp; t) {
+			std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+			queue_.push(t);
+			ready_.notify_one();
+		}
+
+		void wait_and_pop(Task&amp; t) {
+			std::unique_lock&lt;std::mutex&gt; lock(mtx_);
+			if (queue_.empty() &amp;&amp; !done_)
+				ready_.wait(lock);
+			if (done_)
+				return;
+			t = queue_.front();
+			queue_.pop();
+		}
+
+		bool empty()const {
+			std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+			return queue_.empty();
+		}
+
+		void clear() {
+			std::lock_guard&lt;std::mutex&gt; lock(mtx_);
+			for (int i = 0; i &lt; queue_.size(); ++i)
+				queue_.pop();
+		}
+
+		void done() {
+			done_ = true;
+			ready_.notify_all();
+		}
+	private:
+		std::queue&lt;Task&gt; queue_;
+		mutable std::mutex mtx_;
+		std::condition_variable ready_;
+		std::atomic_bool done_;
+	};
+
+	class thread_pool {
+	public:
+		thread_pool(const int threadNum) :done_(false) {
+			for (int i = 0; i &lt; threadNum; ++i) {
+				threads_.emplace_back(&amp;thread_pool::workerThread, this);
+			}
+		}
+		~thread_pool() {
+			done_.store(true);
+			queue_.done();
+			for (auto&amp; thread : threads_) {
+				if (thread.joinable())
+					thread.join();
+			}
+		}
+		void submit(const std::function&lt;void(void)&gt;&amp; t) {
+			queue_.push(t);
+		}
+
+		bool isEmpty()const {
+			return queue_.empty();
+		}
+
+		void clearTask() {
+			queue_.clear();
+		}
+	private:
+		void workerThread() {
+			while (true) {
+				std::function&lt;void(void)&gt; t;
+				queue_.wait_and_pop(t);
+				if (done_)
+					break;
+				if (t)
+					t();
+			}
+		}
+	private:
+		std::vector&lt;std::thread&gt; threads_;
+		thread_safe_queue&lt;std::function&lt;void(void)&gt;&gt; queue_;
+		std::atomic_bool done_;
+	};
+}
+</code></pre>
+<p>队列里存放的是<code>std::function&lt;void(void)&gt;</code>，是一个没有参数和返回值的<code>Callable</code>。在C++中，常用的Callable包括lambda表达式、function object（也就是<code>operator()</code>）、<code>std::bind</code>和<code>std::function</code>。我个人比较喜欢使用lambda和<code>std::bind</code>，他们都很简单易用，在使用<code>std::bind</code>时，如果你的函数是一个member function，别忘了把<code>this</code>作为第一个参数。</p>
+<p>这个线程池非常简单，当你调用构造函数时，传入一个你想要的线程数量，然后构造函数体里就会开启对应数量的线程。<code>std::thread</code>接受一个Callable和它的参数作为构造函数的参数，构造函数完成后线程立即启动，这里的<code>workerThread</code>是一个member function，所以，我们还得加上<code>this</code>作为参数，跟<code>std::bind</code>一样。</p>
+<p><code>workerThread</code>函数里面循环地从队列中获取任务并执行，如果没有任务，他就会处于等待状态。可以看到这里同样有一个<code>std::atomic_bool</code>的变量<code>done_</code>，它用于使线程结束。我们会在线程池的析构函数里将这个变量设为<code>true</code>，然后我们调用队列的<code>done</code>函数，让队列退出。最后我们逐个检查线程池中的线程，如果他们还在运行，等待他们结束。<strong>一个<code>std::thread</code>在析构前必须指定等待该线程结束还是分离该线程，否则会发生错误。</strong> 如果我们不做这些工作，那么线程池在析构时要么是其中的线程一直处于等待状态，要么是一直处于循环状态，这会导致析构函数停滞不前，也就是程序的卡死。</p>
+<h2 id="五-总结">五、总结</h2>
+<p>这次实现的线程池只能说是实现了最基础的功能，还缺少一些功能，例如任务返回值的缺失等。本文实现的线程安全队列也十分简单，还有很多可以优化的地方。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/android-deeplink/">
+                <h3 class="post-title">
+                  Android deeplink
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge secondary">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge success">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge warning">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge secondary">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge secondary">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge secondary">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge secondary">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge ">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge success">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge success">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>二叉树 | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>二叉树</h1>
+            <p class="article-meta">
+              2021-07-10
+              
+                <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+                  data structure
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge ">
+                  tree
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="一-定义">一、定义</h2>
+<pre><code class="language-c++">struct TreeNode {
+     int val;
+     TreeNode *left;
+     TreeNode *right;
+     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+</code></pre>
+<h2 id="二-二叉树的遍历">二、二叉树的遍历</h2>
+<h3 id="21-前序遍历">2.1 前序遍历</h3>
+<p>前序遍历（<strong>Pre-Order Traversal</strong>）的访问顺序为：</p>
+<pre><code>根节点-&gt;左子树-&gt;右子树
+</code></pre>
+<h4 id="211-递归写法">2.1.1 递归写法</h4>
+<pre><code class="language-c++">void recursivePreorderTraverseImpl(TreeNode *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    res.push_back(node-&gt;val);
+    recursivePreorderTraverseImpl(node-&gt;left, res);
+    recursivePreorderTraverseImpl(node-&gt;right, res);
+}
+
+std::vector&lt;int&gt; recursivePreorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    recursivePreorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="212-迭代写法">2.1.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationPreorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;TreeNode *&gt; nodeStack;
+    nodeStack.push(root);
+    while (!nodeStack.empty()) {
+        TreeNode *node = nodeStack.top();
+        res.push_back(node-&gt;val);
+        nodeStack.pop();
+        if (node-&gt;right) {
+            nodeStack.push(node-&gt;right);
+        }
+        if (node-&gt;left) {
+            nodeStack.push(node-&gt;left);
+        }
+    }
+    return res;
+}
+</code></pre>
+<p>当使用迭代遍历二叉树时，使用以下步骤：</p>
+<ol>
+<li>首先将根节点<code>push</code>栈中</li>
+<li>读取栈顶的值，并将右子节点和左子节点<code>push</code>到栈中，因为栈是先入后出，所以需要最后将左子节点<code>push</code>进去</li>
+<li>重复1、2步读取栈顶节点</li>
+</ol>
+<h3 id="22-中序遍历">2.2 中序遍历</h3>
+<p>中序遍历（<strong>In-Order Traversal</strong>）的访问顺序为：</p>
+<pre><code>左子树-&gt;根节点-&gt;右子树
+</code></pre>
+<h4 id="221-递归写法">2.2.1 递归写法</h4>
+<pre><code class="language-c++">void recursiveInorderTraverseImpl(TreeNode *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    recursiveInorderTraverseImpl(node-&gt;left, res);
+    res.push_back(node-&gt;val);
+    recursiveInorderTraverseImpl(node-&gt;right, res);
+}
+
+std::vector&lt;int&gt; recursiveInorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    recursiveInorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="222-迭代写法">2.2.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationInorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    std::stack&lt;TreeNode *&gt; nodeStack;
+    while (root || !nodeStack.empty()) {
+        while (root) {
+            nodeStack.push(root);
+            root = root-&gt;left;
+        }
+        root = nodeStack.top();
+        nodeStack.pop();
+        res.push_back(root-&gt;val);
+        root = root-&gt;right;
+    }
+    return res;
+}
+</code></pre>
+<p>这里的思路就是模拟递归的遍历过程，关键在于使用<code>std::stack</code>来模拟函数调用栈：</p>
+<ol>
+<li>将根节点及其左子节点都<code>push</code>到栈中</li>
+<li>当左右根节点及其左子节点都进入栈中后，将栈顶的节点弹出，由于该节点已经没有左子树，所以首先将它的值放到结果集中，然后将根节点设为该节点的右子节点</li>
+<li>重复1、2步直至栈空。</li>
+</ol>
+<h3 id="23-后序遍历">2.3 后序遍历</h3>
+<p>中序遍历（<strong>Post-Order Traversal</strong>）的访问顺序为：</p>
+<pre><code>左子树-&gt;右子树-&gt;根节点
+</code></pre>
+<h4 id="231-递归写法">2.3.1 递归写法</h4>
+<pre><code class="language-c++">void recursivePostorderTraverseImpl(TreeNode *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    recursivePostorderTraverseImpl(node-&gt;left, res);
+    recursivePostorderTraverseImpl(node-&gt;right, res);
+    res.push_back(node-&gt;val);
+}
+
+std::vector&lt;int&gt; recursivePostorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    recursivePostorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="232-迭代写法">2.3.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationPostorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;TreeNode *&gt; nodeStack;
+    nodeStack.push(root);
+    while (!nodeStack.empty()) {
+        TreeNode *node = nodeStack.top();
+        nodeStack.pop();
+        res.push_back(node-&gt;val);
+        if (node-&gt;left) {
+            nodeStack.push(node-&gt;left);
+        }
+        if (node-&gt;right) {
+            nodeStack.push(node-&gt;right);
+        }
+    }
+    std::reverse(res.begin(), res.end());
+    return res;
+}
+</code></pre>
+<p>类似于前序遍历的迭代写法，当我们调换push到栈中的左右子树顺序，那么结果就是：</p>
+<pre><code>[根节点] [右子树] [左子树]
+</code></pre>
+<p>将结果倒序，就成为了：</p>
+<pre><code>[左子树] [右子树] [根节点]
+</code></pre>
+<h3 id="24-层序遍历">2.4 层序遍历</h3>
+<p>层序遍历按照树的层次依次遍历树的节点。</p>
+<h4 id="241-利用队列">2.4.1 利用队列</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; levelorderTraverse(TreeNode *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::queue&lt;TreeNode *&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        TreeNode *node = q.front();
+        res.push_back(node-&gt;val);
+        if (node-&gt;left) {
+            q.push(node-&gt;left);
+        }
+        if (node-&gt;right) {
+            q.push(node-&gt;right);
+        }
+        q.pop();
+    }
+    return res;
+}
+</code></pre>
+<p>这里借助队列完成层序遍历：</p>
+<ol>
+<li>将根节点<code>push</code>到队列中</li>
+<li>读取队列头部的节点内容，然后将该节点的左子节点和右子节点<code>push</code>到队列中</li>
+<li>将队列头部节点弹出队列</li>
+<li>重复2、3步直至队列为空</li>
+</ol>
+<h4 id="242-将结果按层输出">2.4.2 将结果按层输出</h4>
+<p>上一节将所有结果都放到一个动态数组中，如果需要将结果分层放入到不同的动态数组中，则需要稍微改动一点代码。实际上，刚刚每次读取头部节点并将左子节点和右子节点<code>push</code>到队列中的操作，就是将下一层的节点放到队列末尾，等待该层所有节点遍历完毕，才回去遍历下一层的节点。</p>
+<p>所以，这里使用一个辅助的队列，用于存放下一层的所有节点。当该层节点都遍历完成后，在遍历辅助队列中的下一层节点。</p>
+<pre><code class="language-c++">std::vector&lt;std::vector&lt;int&gt;&gt; levelorderTraverse2(TreeNode *root) {
+    std::vector&lt;std::vector&lt;int&gt;&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::queue&lt;TreeNode *&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        std::queue&lt;TreeNode *&gt; tmp;
+        std::vector&lt;int&gt; line;
+        while (!q.empty()) {
+            TreeNode *node = q.front();
+            q.pop();
+            line.push_back(node-&gt;val);
+            if (node-&gt;left) {
+                tmp.push(node-&gt;left);
+            }
+            if (node-&gt;right) {
+                tmp.push(node-&gt;right);
+            }
+        }
+        res.push_back(line);
+        q = tmp;
+    }
+    return res;
+}
+</code></pre>
+<p>其实，不借助辅助队列也是可以的，因为每次<code>push</code>都会将所有下一层的子节点都放到队列中，只需要在遍历这些节点前记录下一层子节点的数量即可：</p>
+<pre><code class="language-c++">std::vector&lt;std::vector&lt;int&gt;&gt; levelOrder(TreeNode* root) {
+    std::vector&lt;std::vector&lt;int&gt;&gt; res;
+    std::queue&lt;TreeNode*&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        auto len = q.size();
+        std::vector&lt;int&gt; line;
+        for (auto i = 0; i &lt; len; ++i) {
+            TreeNode* n = q.front();
+            q.pop();
+            if (!n) {
+                continue;
+            }
+            line.push_back(n-&gt;val);
+            if (n-&gt;left) {
+                q.push(n-&gt;left);
+            }
+            if (n-&gt;right) {
+                q.push(n-&gt;right);
+            }
+        }
+        if (!line.empty()) {
+            res.push_back(line);
+        }
+    }
+    return res;
+}
+</code></pre>
+<h2 id="三-n叉树的遍历">三、n叉树的遍历</h2>
+<p>n叉树的定义类似于二叉树，n叉树拥有不定数量的子节点，它的遍历相较于二叉树，没有本质区别，下面仅给出代码。</p>
+<pre><code class="language-c++">class Node {
+   public:
+    int val;
+    std::vector&lt;Node *&gt; children;
+    Node() {}
+    Node(int _val) { val = _val; }
+    Node(int _val, std::vector&lt;Node *&gt; _children) {
+        val = _val;
+        children = _children;
+    }
+};
+</code></pre>
+<h3 id="31-前序遍历">3.1 前序遍历</h3>
+<p><a href="https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/">589. N 叉树的前序遍历 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h4 id="311-递归写法">3.1.1 递归写法</h4>
+<pre><code class="language-c++">void recursiveNArrPreorderTraverseImpl(Node *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    res.push_back(node-&gt;val);
+    for (auto c : node-&gt;children) {
+        recursiveNArrPreorderTraverseImpl(c, res);
+    }
+}
+
+std::vector&lt;int&gt; recursiveNArrPreorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    recursiveNArrPreorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="312-迭代写法">3.1.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationNArrPreorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;Node *&gt; s;
+    s.push(root);
+    while (!s.empty()) {
+        Node *node = s.top();
+        s.pop();
+        res.push_back(node-&gt;val);
+        auto &amp;c = node-&gt;children;
+        for (auto rb = c.rbegin(); rb != c.rend(); ++rb) {
+            if (*rb) {
+                s.push(*rb);
+            }
+        }
+    }
+    return res;
+}
+</code></pre>
+<h3 id="32-后序遍历">3.2 后序遍历</h3>
+<p><a href="https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/">590. N 叉树的后序遍历 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h4 id="321-递归写法">3.2.1 递归写法</h4>
+<pre><code class="language-c++">void recursiveNArrPostorderTraverseImpl(Node *node, std::vector&lt;int&gt; &amp;res) {
+    if (!node) {
+        return;
+    }
+    for (auto c : node-&gt;children) {
+        recursiveNArrPostorderTraverseImpl(c, res);
+    }
+    res.push_back(node-&gt;val);
+}
+
+std::vector&lt;int&gt; recursiveNArrPostorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    recursiveNArrPostorderTraverseImpl(root, res);
+    return res;
+}
+</code></pre>
+<h4 id="322-迭代写法">3.2.2 迭代写法</h4>
+<pre><code class="language-c++">std::vector&lt;int&gt; iterationNArrPostorderTraverse(Node *root) {
+    std::vector&lt;int&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::stack&lt;Node *&gt; s;
+    s.push(root);
+    while (!s.empty()) {
+        Node *node = s.top();
+        s.pop();
+        res.push_back(node-&gt;val);
+        auto &amp;c = node-&gt;children;
+        for (auto pc : c) {
+            s.push(pc);
+        }
+    }
+    std::reverse(res.begin(), res.end());
+    return res;
+}
+</code></pre>
+<h3 id="33-层序遍历">3.3 层序遍历</h3>
+<p><a href="https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/">429. N 叉树的层序遍历 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<pre><code class="language-c++">std::vector&lt;std::vector&lt;int&gt;&gt; nArrLevelorderTraverse(Node *root) {
+    std::vector&lt;std::vector&lt;int&gt;&gt; res;
+    if (!root) {
+        return res;
+    }
+    std::queue&lt;Node *&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        std::vector&lt;int&gt; line;
+        std::queue&lt;Node *&gt; tmp;
+        while (!q.empty()) {
+            Node *n = q.front();
+            q.pop();
+            line.push_back(n-&gt;val);
+            auto &amp;c = n-&gt;children;
+            for (auto pc : c) {
+                if (pc) {
+                    tmp.push(pc);
+                }
+            }
+        }
+        res.push_back(line);
+        q = tmp;
+    }
+    return res;
+}
+</code></pre>
+<h2 id="四-二叉树的反转">四、二叉树的反转</h2>
+<p><a href="https://leetcode-cn.com/problems/invert-binary-tree/">226. 翻转二叉树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h3 id="41-递归写法">4.1 递归写法</h3>
+<pre><code class="language-c++">void invertTreeImpl(TreeNode* node) {
+    if (!node) {
+        return;
+    }
+    std::swap(node-&gt;left, node-&gt;right);
+    invertTreeImpl(node-&gt;left);
+    invertTreeImpl(node-&gt;right);
+}
+
+TreeNode* invertTree(TreeNode* root) {
+    if (!root) {
+        return nullptr;
+    }
+    invertTreeImpl(root);
+    return root;
+}
+</code></pre>
+<h3 id="42-迭代写法">4.2 迭代写法</h3>
+<pre><code class="language-c++">TreeNode* iterationInvertTree(TreeNode* root) {
+    std::queue&lt;TreeNode*&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        TreeNode* n = q.front();
+        q.pop();
+        if (!n) {
+            continue;
+        }
+        std::swap(n-&gt;left, n-&gt;right);
+        q.push(n-&gt;left);
+        q.push(n-&gt;right);
+    }
+    return root;
+}
+</code></pre>
+<h3 id="43-think">4.3 think</h3>
+<p>反转二叉树的主要步骤就是<code>std::swap(n-&gt;left, n-&gt;right)</code>，所以只要对于所有节点都执行一次<code>swap</code>操作就可以了，所以本质上，二叉树的反转依旧是二叉树的遍历问题。对于递归写法，你可以将<code>swap</code>操作放在递归调用点的任何地方，<strong>但是注意，当你放在中间使用中序遍历的时候，需要做一些小的修改，因为<code>std::swap</code>修改了<code>TreeNode*</code>指针的指向，所以你需要将第二个<code>node-&gt;right</code>修改为<code>node-&gt;left</code></strong>：</p>
+<pre><code class="language-c++">void invertTreeInorderImpl(TreeNode* node) {
+    if (!node) {
+        return;
+    }
+    invertTreeInorderImpl(node-&gt;left);
+    std::swap(node-&gt;left, node-&gt;right);
+    invertTreeInorderImpl(node-&gt;left);
+}
+</code></pre>
+<p>对于迭代写法，也是同样的道理。</p>
+<h2 id="五-填充每个节点的下一个右侧节点指针">五、填充每个节点的下一个右侧节点指针</h2>
+<p><a href="https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node/">116. 填充每个节点的下一个右侧节点指针 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h3 id="51-层序遍历">5.1 层序遍历</h3>
+<p>由于二叉树为完美二叉树，所有父节点都有两个子节点，所以首先会想到使用层序遍历，将每层的节点都存储到队列中，然后处理队列中的节点，代码只需要在[2.4.2](#2.4.2  将结果按层输出)的基础上稍作修改：</p>
+<pre><code class="language-c++">Node* connect(Node* root) {
+    std::queue&lt;Node*&gt; q;
+    q.push(root);
+    while (!q.empty()) {
+        auto len = q.size();
+        for (auto i = 0; i &lt; len; ++i) {
+            Node* n = q.front();
+            q.pop();
+            if (!n) {
+                continue;
+            }
+            if (i &lt; len - 1) {
+                n-&gt;next = q.front();
+            }
+            q.push(n-&gt;left);
+            q.push(n-&gt;right);
+        }
+    }
+    return root;
+}
+</code></pre>
+<h3 id="52-递归写法">5.2 递归写法</h3>
+<p>根据要求，需要讲所有层级的子节点都指向右侧节点，所以不但需要将左右两个子节点连接，还需要将前一个节点的右子节点和后一个节点的左子节点连接。显然，使用一个节点无法完成跨节点的连接，所以需要两个节点：</p>
+<pre><code class="language-c++">void recursiveConnectImpl(Node* n1, Node* n2) {
+    if (!n1 || !n2) {
+        return;
+    }
+    n1-&gt;next = n2;
+    recursiveConnectImpl(n1-&gt;left, n1-&gt;right);
+    recursiveConnectImpl(n1-&gt;right, n2-&gt;left);
+    recursiveConnectImpl(n2-&gt;left, n2-&gt;right);
+}
+
+Node* recursiveConnect(Node* root) {
+    if (root) {
+        recursiveConnectImpl(root-&gt;left, root-&gt;right);
+    }
+    return root;
+}
+</code></pre>
+<h2 id="六-二叉树转化为链表">六、二叉树转化为链表</h2>
+<p><a href="https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list/">114. 二叉树展开为链表 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<h3 id="61-前序遍历后修改">6.1 前序遍历后修改</h3>
+<p>很自然地，使用前序遍历的方式将所有节点都存放在动态数组中，再依次修改节点的指向，形成单向链表：</p>
+<pre><code class="language-c++">void traverseTree(TreeNode* node, std::vector&lt;TreeNode*&gt;&amp; res) {
+    if (!node) {
+        return;
+    }
+    res.push_back(node);
+    traverseTree(node-&gt;left, res);
+    traverseTree(node-&gt;right, res);
+}
+
+void flatten(TreeNode* root) {
+    std::vector&lt;TreeNode*&gt; res;
+    traverseTree(root, res);
+    if (res.empty()) {
+        return;
+    }
+    int len = res.size();
+    for (auto i = 0; i &lt; len - 1; ++i) {
+        res[i]-&gt;right = res[i + 1];
+        res[i]-&gt;left = nullptr;
+    }
+}
+</code></pre>
+<p>这里注意，在<code>C++</code>中，当<code>unsigned</code>与<code>signed</code>相减时，结果会被转化为<code>unsigned</code>，所以当<code>root</code>节点为<code>nullptr</code>时，存放节点的<code>vector</code>就是空的，此时<code>res.size()-1</code>的结果会由<code>-1</code>转化为<code>unsigned</code>，具体结果根据机器架构的不同而有差异。在32位机器上，一般来说<code>signed</code>会使用最高位表示符号位，此时<code>-1</code>的二进制表示就是<code>1000 0000 0000 0000 0000 0000 0000 0001</code>，转化为<code>unsigned</code>就是<code>2^31+2^0</code>，即<code>2147483649</code>，所以在<code>for</code>循环中涉及到<code>vector</code>的<code>size()</code>运算时，最好先讲<code>size()</code>转化为<code>signed</code>整数。</p>
+<h3 id="62-递归写法">6.2 递归写法</h3>
+<p>递归写法在于先将树展开，然后将左子树接到右子树上，再将原来的右子树接到左子树下方:</p>
+<pre><code class="language-c++">void flatten2(TreeNode* root) {
+    if (!root) {
+        return;
+    }
+    flatten2(root-&gt;left);
+    flatten2(root-&gt;right);
+    TreeNode* right = root-&gt;right;
+    TreeNode* left = root-&gt;left;
+    root-&gt;left = nullptr;
+    root-&gt;right = left;
+    TreeNode* p = root;
+    while (p-&gt;right) {
+        p = p-&gt;right;
+    }
+    p-&gt;right = right;
+}
+</code></pre>
+<h2 id="七-构建二叉树">七、构建二叉树</h2>
+<h3 id="71-最大二叉树">7.1 最大二叉树</h3>
+<p><a href="https://leetcode-cn.com/problems/maximum-binary-tree/">654. 最大二叉树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>首先要明确每次递归要做的事情，在这里，我们需要：</p>
+<ol>
+<li>求得数组的最大值</li>
+<li>将最大值构建为一个树节点并连接到父节点上</li>
+<li>分别对最大值左右两侧的子数组进行递归调用</li>
+</ol>
+<p><code>getMax</code>函数用于求得子数组的最大值及其所处的位置，这里我们选取的递归<code>base case</code>为当最大值的左右两侧是否还具有子数组：</p>
+<pre><code class="language-c++">std::pair&lt;int, int&gt; getMax(const std::vector&lt;int&gt;&amp; nums, int s, int e) {
+    int max = 0, maxPos = 0;
+    for (auto i = s; i &lt;= e; ++i) {
+        if (nums[i] &gt;= max) {
+            max = nums[i];
+            maxPos = i;
+        }
+    }
+    return std::make_pair(max, maxPos);
+}
+
+TreeNode* constructImpl(const std::vector&lt;int&gt;&amp; nums, int s, int e) {
+    auto maxPair = getMax(nums, s, e);
+    auto maxNum = maxPair.first;
+    auto maxPos = maxPair.second;
+    TreeNode* newNode = new TreeNode(maxNum);
+    if (maxPos &gt; s) {
+        newNode-&gt;left = constructImpl(nums, s, maxPos - 1);
+    }
+    if (maxPos &lt; e) {
+        newNode-&gt;right = constructImpl(nums, maxPos + 1, e);
+    }
+    return newNode;
+}
+
+TreeNode* constructMaximumBinaryTree(std::vector&lt;int&gt;&amp; nums) {
+    if (nums.empty()) {
+        return nullptr;
+    }
+    return constructImpl(nums, 0, nums.size() - 1);
+}
+</code></pre>
+<h3 id="72-从前序遍历和中序遍历结果构建二叉树">7.2 从前序遍历和中序遍历结果构建二叉树</h3>
+<p><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/">105. 从前序与中序遍历序列构造二叉树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>由于前序遍历的结果为：</p>
+<pre><code>[根结点] [左子树] [右子树]
+</code></pre>
+<p>而中序遍历的结果为：</p>
+<pre><code>[左子树] [根结点] [右子树]
+</code></pre>
+<p>同时序列中没有重复数字，所以可以根据前序遍历结果得到根结点的值，再到中序遍历的结果中找到该值所在的位置，就可以构建该节点及其左右子树，显然这是一个递归的构建过程：</p>
+<pre><code class="language-c++">std::size_t getInorderRootPos(int rootNodeVal, const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    for (auto i = inorderStart; i &lt;= inorderEnd; ++i) {
+        if (inorder[i] == rootNodeVal) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+TreeNode* constructBinaryTree(const std::vector&lt;int&gt;&amp; preorder,
+                              const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t preorderStart,
+                              std::size_t preorderEnd, std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    auto rootNodeVal = preorder[preorderStart];
+    TreeNode* n = new TreeNode(rootNodeVal);
+    auto inorderRootPos =
+        getInorderRootPos(rootNodeVal, inorder, inorderStart, inorderEnd);
+    auto leftSubTreeLen = inorderRootPos - inorderStart;
+    if (leftSubTreeLen &gt; 0) {
+        n-&gt;left = constructBinaryTree(preorder, inorder, preorderStart + 1,
+                                      preorderStart + leftSubTreeLen,
+                                      inorderStart, inorderRootPos - 1);
+    }
+    auto rightSubTreeLen = inorderEnd - inorderRootPos;
+    if (rightSubTreeLen &gt; 0) {
+        n-&gt;right = constructBinaryTree(
+            preorder, inorder, preorderStart + leftSubTreeLen + 1, preorderEnd,
+            inorderRootPos + 1, inorderEnd);
+    }
+    return n;
+}
+
+TreeNode* buildTree(std::vector&lt;int&gt;&amp; preorder, std::vector&lt;int&gt;&amp; inorder) {
+    if (preorder.empty()) {
+        return nullptr;
+    }
+    return constructBinaryTree(preorder, inorder, 0, preorder.size() - 1, 0,
+                               inorder.size() - 1);
+}
+</code></pre>
+<h3 id="73-从中序与后序遍历序列构造二叉树">7.3 从中序与后序遍历序列构造二叉树</h3>
+<p><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/">106. 从中序与后序遍历序列构造二叉树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>由于后序遍历的结果为：</p>
+<pre><code>[左子树] [右子树] [根结点]
+</code></pre>
+<p>所以可以找到跟节点的值。</p>
+<p>又因为序列没有重复数字，而中序遍历的结果为：</p>
+<pre><code>[左子树] [根结点] [右子树]
+</code></pre>
+<p>所以可以得到改根结点的左右子树，代码类似<code>7.2</code>：</p>
+<pre><code class="language-c++">std::size_t getInorderRootPos(int rootNodeVal, const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    for (auto i = inorderStart; i &lt;= inorderEnd; ++i) {
+        if (inorder[i] == rootNodeVal) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+TreeNode* constructBinaryTree(const std::vector&lt;int&gt;&amp; postorer,
+                              const std::vector&lt;int&gt;&amp; inorder,
+                              std::size_t postorerStart,
+                              std::size_t postorerEnd, std::size_t inorderStart,
+                              std::size_t inorderEnd) {
+    auto rootNodeVal = postorer[postorerEnd];
+    TreeNode* n = new TreeNode(rootNodeVal);
+    auto inorderRootPos =
+        getInorderRootPos(rootNodeVal, inorder, inorderStart, inorderEnd);
+    auto leftSubTreeLen = inorderRootPos - inorderStart;
+    if (leftSubTreeLen &gt; 0) {
+        n-&gt;left = constructBinaryTree(postorer, inorder, postorerStart,
+                                      postorerStart + leftSubTreeLen - 1,
+                                      inorderStart, inorderRootPos - 1);
+    }
+    auto rightSubTreeLen = inorderEnd - inorderRootPos;
+    if (rightSubTreeLen &gt; 0) {
+        n-&gt;right = constructBinaryTree(
+            postorer, inorder, postorerStart + leftSubTreeLen, postorerEnd - 1,
+            inorderRootPos + 1, inorderEnd);
+    }
+    return n;
+}
+
+TreeNode* buildTree(std::vector&lt;int&gt;&amp; inorder, std::vector&lt;int&gt;&amp; postorder) {
+    if (postorder.empty()) {
+        return nullptr;
+    }
+    return constructBinaryTree(postorder, inorder, 0, postorder.size() - 1, 0,
+                               inorder.size() - 1);
+}
+</code></pre>
+<h2 id="八-寻找重复子树">八、寻找重复子树</h2>
+<p><a href="https://leetcode-cn.com/problems/find-duplicate-subtrees/">652. 寻找重复的子树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>使用前序遍历，将所有子树的前序遍历结果保存在哈希表中，当前序遍历结果等于2时，说明此子树重复。</p>
+<pre><code class="language-c++">std::string getSubTreeSeq(TreeNode* n,
+                          std::unordered_map&lt;std::string, int&gt;&amp; counter,
+                          std::vector&lt;TreeNode*&gt;&amp; res) {
+    if (!n) {
+        return &quot;$&quot;;
+    }
+    std::ostringstream oss;
+    oss &lt;&lt; n-&gt;val &lt;&lt; ',' &lt;&lt; getSubTreeSeq(n-&gt;left, counter, res) &lt;&lt; ','
+        &lt;&lt; getSubTreeSeq(n-&gt;right, counter, res);
+    std::string seq = oss.str();
+    ++counter[seq];
+    if (counter[seq] == 2) {
+        res.push_back(n);
+    }
+    return seq;
+}
+
+std::vector&lt;TreeNode*&gt; findDuplicateSubtrees2(TreeNode* root) {
+    std::unordered_map&lt;std::string, int&gt; counter;
+    std::vector&lt;TreeNode*&gt; res;
+    getSubTreeSeq(root, counter, res);
+    return res;
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/zhong-duan-dai-li-jiao-ben/">
+                <h3 class="post-title">
+                  terminal如何走代理
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge secondary">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge ">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge ">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge ">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge warning">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge success">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge success">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge warning">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge warning">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge warning">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

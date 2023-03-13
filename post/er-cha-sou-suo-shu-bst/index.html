@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>二叉搜索树（BST） | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>二叉搜索树（BST）</h1>
+            <p class="article-meta">
+              2021-07-12
+              
+                <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge ">
+                  BST
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+                  data structure
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge secondary">
+                  tree
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>二叉搜索树基于二叉树，其左子树的所有节点均小于根结点，而右子树的所有节点均大于根结点，同时其左右子树又都是二叉搜索树。</p>
+<h2 id="一-二叉搜索树中的第k个最小元素">一、二叉搜索树中的第K个最小元素</h2>
+<p><a href="https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/">230. 二叉搜索树中第K小的元素 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>使用中序遍历就可以得到二叉搜索树中元素的升序排列：</p>
+<pre><code class="language-c++">void traverse(TreeNode* n, int k, int&amp; c, int&amp; res) {
+    if (!n) {
+        return;
+    }
+    traverse(n-&gt;left, k, c, res);
+    ++c;
+    if (c == k) {
+        res = n-&gt;val;
+        return;
+    } else if (c &gt; k) {
+        return;
+    } else {
+        traverse(n-&gt;right, k, c, res);
+    }
+}
+
+int kthSmallest(TreeNode* root, int k) {
+    int res = 0, c = 0;
+    traverse(root, k, c, res);
+    return res;
+}
+</code></pre>
+<p>当每次读取bst中的序列时，都自增计数器：</p>
+<ul>
+<li>当计数器等于要求的值时，保存结果；</li>
+<li>当计数器小于要求的值时，继续读取；</li>
+<li>当计数器大雨要求的值时，从递归中跳出。</li>
+</ul>
+<h2 id="二-把二叉搜索树转化为累加树">二、把二叉搜索树转化为累加树</h2>
+<p><a href="https://leetcode-cn.com/problems/convert-bst-to-greater-tree/">538. 把二叉搜索树转换为累加树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>根据题意，累加树就是使每个节点 <code>node</code> 的新值等于原树中大于或等于 <code>node.val</code> 的值之和，简单来说就是将二叉搜索树中所有节点的值都增加该节点右子树所有节点之和。</p>
+<p>中序遍历二叉搜索树最后才能访问到右子树，此时我们倒过来。先访问树的右子树，使用一个变量记录当前的右子树之和，然后将该变量加到树的根结点上，再访问左子树:</p>
+<pre><code class="language-c++">void traverseBst(TreeNode* n, int&amp; sum) {
+    if (!n) {
+        return;
+    }
+    traverseBst(n-&gt;right, sum);
+    n-&gt;val = n-&gt;val += sum;
+    sum = n-&gt;val;
+    traverseBst(n-&gt;left, sum);
+}
+
+TreeNode* bstToGst(TreeNode* root) {
+    int sum = 0;
+    traverseBst(root, sum);
+    return root;
+}
+</code></pre>
+<h2 id="三-不同的二叉搜索树">三、不同的二叉搜索树</h2>
+<p><a href="https://leetcode-cn.com/problems/unique-binary-search-trees/">96. 不同的二叉搜索树 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<p>当固定某个值<code>a</code>为根结点时，其左侧的值为<code>[1,a-1]</code>，右侧的值为<code>[a+1,n]</code>，定义<code>f(n)</code>为n个不同的数组成的二叉搜索树的种类，那么此时:</p>
+<pre><code>f(n)=f(a-1-1+1)+f(n-(a+1)+1)
+</code></pre>
+<p>由此将求得<code>[1,n]</code>二叉搜索树的种类分解为了两个子问题，而当n=1或者0时，<code>f(n)</code>的结果显然为<code>1</code>，由此可以推断出：</p>
+<pre><code>f(2)=f(1)*f(0)+f(0)*f(1)=2
+f(3)=f(2)*f(0)+f(1)*f(1)+f(0)*f(2)=5
+...
+</code></pre>
+<p>代码如下：</p>
+<pre><code class="language-c++">int numTrees(int n) {
+    std::vector&lt;int&gt; dp{1, 1};
+    for (auto i = 2; i &lt;= n; ++i) {
+        dp.push_back(0);
+        for (auto j = 0; j &lt; i; ++j) {
+            dp[i] += dp[j] * dp[i - 1 - j];
+        }
+    }
+    return dp[n];
+}
+</code></pre>
+<h2 id="四-不同的二叉搜索树二">四、不同的二叉搜索树（二）</h2>
+<p><a href="https://leetcode-cn.com/problems/unique-binary-search-trees-ii/submissions/">95. 不同的二叉搜索树 II - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+<pre><code class="language-c++">std::vector&lt;TreeNode*&gt; constructBst(int s, int e) {
+    std::vector&lt;TreeNode*&gt; res;
+    if (s &gt; e) {
+        res.push_back(nullptr);
+        return res;
+    }
+    for (auto i = s; i &lt;= e; ++i) {
+        auto leftRes = constructBst(s, i - 1);
+        auto rightRes = constructBst(i + 1, e);
+        for (auto l : leftRes) {
+            for (auto r : rightRes) {
+                TreeNode* node = new TreeNode(i);
+                node-&gt;left = l;
+                node-&gt;right = r;
+                res.push_back(node);
+            }
+        }
+    }
+    return res;
+}
+
+std::vector&lt;TreeNode*&gt; generateTrees(int n) {
+    return constructBst(1, n);
+}
+</code></pre>
+<p>对于每一次递归，都会计算当前递归层次所有的左右子树可构建的二叉搜索树的根结点。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">
+                <h3 class="post-title">
+                  Git基础(一)
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge secondary">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge success">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge success">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge secondary">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge secondary">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge warning">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge warning">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge ">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge secondary">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge success">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

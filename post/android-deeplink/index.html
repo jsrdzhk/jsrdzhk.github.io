@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Android deeplink | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Android deeplink</h1>
+            <p class="article-meta">
+              2021-02-20
+              
+                <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
+                  Android
+                </a>
+              
+                <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge ">
+                  Kotlin
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>deeplink用于将用户快速引导至对应应用的某个板块，在电商广告中使用较多，用户只需要点击广告变可以直接跳转到对应的电商APP的商品下单处，如果用户没有下载该应用，就跳转到下载页引导用户下载安装，完成新用户的转化。</p>
+<h2 id="一-具体实现">一、具体实现</h2>
+<p>在<code>Android</code>中实现<code>deeplink</code>非常简单，只需要在<code>AndroidManifest.xml</code>的<code>Activity</code>中添加以下代码即可：</p>
+<pre><code class="language-xml">&lt;intent-filter android:autoVerify=&quot;true&quot;&gt;
+  &lt;action android:name=&quot;android.intent.action.VIEW&quot; /&gt;
+
+  &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
+  &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot; /&gt;
+
+  &lt;data
+        android:scheme=&quot;http&quot;
+        android:host=&quot;medivh.top&quot;
+        android:path=&quot;/main&quot; /&gt;
+&lt;/intent-filter&gt;
+</code></pre>
+<p>此时，只需要在其他应用中使用<code>Intent(Intent.ACTION_VIEW, Uri.parse(&quot;http://medivh.top/main&quot;))</code>，并通过<code>startActivity</code>启动，即可跳转到具有以上声明的应用。</p>
+<p>除了<code>http</code>和<code>https</code>意外，还可以自定义URL的schema。</p>
+<pre><code class="language-xml">&lt;intent-filter android:label=&quot;@string/filter_test_medivh&quot;&gt;
+  &lt;action android:name=&quot;android.intent.action.VIEW&quot; /&gt;
+  &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
+  &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot; /&gt;
+  &lt;data android:scheme=&quot;medivh&quot;
+        android:host=&quot;test&quot; /&gt;
+&lt;/intent-filter&gt;
+</code></pre>
+<p>此时，使用<code>Intent(Intent.ACTION_VIEW, Uri.parse(&quot;medivh://test&quot;))</code>也可以完成应用跳转。</p>
+<p>为了跳转到预期的板块，可以在<code>Intent</code>中加入数据，<code>deeplink</code>的声明者对这些数据进行解析，完成板块的跳转。例如：</p>
+<pre><code class="language-kotlin">val jumpTpMedivhBtn: Button = findViewById(R.id.jump_to_medivh)
+jumpTpMedivhBtn.setOnClickListener {
+  val intent = Intent(Intent.ACTION_VIEW, Uri.parse(&quot;medivh://test&quot;))
+  intent.putExtra(&quot;device_info&quot;, false)
+  startActivity(intent)
+}
+</code></pre>
+<p>在A应用中发起了对B应用的跳转，并在<code>Intent</code>里面加入了一个表示是否跳转到B应用设备信息页的标识位数据。</p>
+<pre><code class="language-kotlin">val appLinkIntent = intent
+val devInfo = appLinkIntent.getBooleanExtra(&quot;device_info&quot;, true)
+if (!devInfo) {
+  Toast.makeText(this, &quot;navigate to slide show:${!devInfo}&quot;, Toast.LENGTH_SHORT).show()
+  navController.navigate(R.id.nav_slideshow)
+}
+</code></pre>
+<p>B应用在Activity的<code>onCreate</code>函数中解析收到的<code>Intent</code>，得知A应用不想跳转到默认的设备信息页面，于是使用<code>navController.navigate(R.id.nav_slideshow)</code>跳转到了其他页面。</p>
+<h2 id="二-处理顺序">二、处理顺序</h2>
+<p><code>Android</code>系统在处理<code>Uri</code>的Intent时遵循以下顺序：</p>
+<ol>
+<li>如果指定了用户的首选应用程序，则该应用程序可以处理URI。</li>
+<li>打开唯一可以处理URI的应用程序。</li>
+<li>允许用户从对话框中选择一个应用程序。</li>
+</ol>
+<p>所以，如果使用<code>http</code>或者<code>https</code>作为链接的schema，那么如果没有应用处理该Intent，<code>Android</code>系统则会调用默认浏览器来进行处理。此时，开发者就可以在这里将链接重定向到app下载地址，引导用户进行下载了。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/best-practice-of-pythons-project-structure/">
+                <h3 class="post-title">
+                  Best practice of Python&#39;s project structure
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge ">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge ">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge warning">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge secondary">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge ">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge secondary">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge secondary">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge ">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge success">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge warning">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge secondary">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge secondary">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge ">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

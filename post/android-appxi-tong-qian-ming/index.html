@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Android app系统签名 | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Android app系统签名</h1>
+            <p class="article-meta">
+              2021-06-29
+              
+                <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
+                  Android
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>在调试应用时，如果需要申请系统权限，例如<code>android.permission.DUMP</code>，则需要将应用设置为系统权限。</p>
+<h2 id="一-android-app权限等级">一、<code>Android app</code>权限等级</h2>
+<p><code>SEAndroid</code>将Android应用按权限等级由低到高分为以下权限等级：</p>
+<table>
+<thead>
+<tr>
+<th>权限等级</th>
+<th>是否具有平台签名</th>
+<th>是否具有system权限</th>
+<th>安装目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>untrusted_app</td>
+<td>🈚️</td>
+<td>🈚</td>
+<td></td>
+</tr>
+<tr>
+<td>platform_app</td>
+<td>🈶️</td>
+<td>🈚️</td>
+<td>system/app</td>
+</tr>
+<tr>
+<td>priv_app</td>
+<td>🈶️</td>
+<td>🈚️</td>
+<td>system/priv-app</td>
+</tr>
+<tr>
+<td>system_app</td>
+<td>🈶️</td>
+<td>🈶️</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="二-提高app权限等级为platform_app">二、提高app权限等级为<code>platform_app</code></h2>
+<p>由于从<code>Android 10</code>开始，<code>system.img</code>已经被编译为<code>EXT4_FEATURE_RO_COMPAT_SHARED_BLOCKS</code><a href="https://twitter.com/topjohnwu/status/1170404631865778177?lang=en">John Wu on Twitter: &quot;I found out that Android 10's system images are formatted with EXT4_FEATURE_RO_COMPAT_SHARED_BLOCKS. It will deduplicate blocks in the filesystem to reduce the image size. On my Pixel XL, the partition is physically not large enough to successfully run 'e2fsck -E unshare_blocks'.&quot; / Twitter</a>，该文件系统为<code>Read Only</code>的，所以将app直接push到<code>system/priv-app</code>下的方法无法在该版本Android使用。</p>
+<p>但是，我们仍然能够通过系统签名的方式，将未签名的app变为<code>platform_app</code>，但是该方法需要拥有系统镜像的签名文件，以<code>Pixel 2</code>手机为例，<code>aosp</code>版本为<code>android-11.0.0_r1</code>：</p>
+<ol>
+<li>
+<p>在<code>prebuilts/sdk/tools/lib/</code>目录下找到<code>signapk.jar</code></p>
+</li>
+<li>
+<p>在<code>build/target/product/security/</code>目录下找到<code>platform.x509.pem</code>和<code>platform.pk8</code></p>
+</li>
+<li>
+<p>使用以下命令进行签名：</p>
+<pre><code class="language-shell">java -Djava.library.path=prebuilts/sdk/tools/linux/lib64 -jar prebuilts/sdk/tools/lib/signapk.jar  build/target/product/security/platform.x509.pem build/target/product/security/platform.pk8 unsigned_apk_path signed_apk_path
+</code></pre>
+<p>其中，<code>-Djava.library.path=prebuilts/sdk/tools/linux/lib64</code>指定了<code>signapk.jar </code>需要加载的依赖，当<code>host machine</code>为<code></code>时，需要将<code>linux</code>替换为<code>darwin</code>，即<code>-Djava.library.path=prebuilts/sdk/tools/darwin/lib64</code>。<code>unsigned_apk_path</code>和<code>signed_apk_path</code>分别是未签名的app和签名之后的app。</p>
+</li>
+</ol>
+<p>对于<code> Silicon</code>机型，<code>java</code>在加载依赖时可能会自动搜索<code>arm64</code>的依赖，发生以下错误：</p>
+<pre><code class="language-java">Exception in thread &quot;main&quot; java.lang.ExceptionInInitializerError
+	at org.conscrypt.OpenSSLBIOInputStream.&lt;init&gt;(OpenSSLBIOInputStream.java:34)
+	at org.conscrypt.OpenSSLX509Certificate.fromX509PemInputStream(OpenSSLX509Certificate.java:119)
+	at org.conscrypt.OpenSSLX509CertificateFactory$1.fromX509PemInputStream(OpenSSLX509CertificateFactory.java:220)
+	at org.conscrypt.OpenSSLX509CertificateFactory$1.fromX509PemInputStream(OpenSSLX509CertificateFactory.java:216)
+	at org.conscrypt.OpenSSLX509CertificateFactory$Parser.generateItem(OpenSSLX509CertificateFactory.java:94)
+	at org.conscrypt.OpenSSLX509CertificateFactory.engineGenerateCertificate(OpenSSLX509CertificateFactory.java:272)
+	at java.base/java.security.cert.CertificateFactory.generateCertificate(CertificateFactory.java:355)
+	at com.android.signapk.SignApk.readPublicKey(SignApk.java:184)
+	at com.android.signapk.SignApk.main(SignApk.java:1007)
+Caused by: java.lang.IllegalArgumentException: Failed to load any of the given libraries: [conscrypt_openjdk_jni-osx-aarch_64, conscrypt_openjdk_jni]
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:160)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:49)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:53)
+	... 9 more
+</code></pre>
+<p>此时，最简单的做法就是使用<code>source build/envsetup.sh</code>和<code>lunch</code>来初始化当前命令行的环境，使<code>java</code>指向<code>aosp</code>自带的<code>jdk</code>。</p>
+<h2 id="三-使用android-studio集成系统签名">三、使用<code>Android Studio</code>集成系统签名</h2>
+<p>上面的方法生成的<code>apk</code>直接安装到刷入了<code>aosp</code>源码的<code>Pixel</code>手机中app就已经是<code>platform_app</code>了，app启动后可以使用<code>ps -Z</code>来查看应用权限等级：</p>
+<pre><code class="language-shell">➜  SDKTest git:(master) ✗ adb shell &quot;ps -Z | grep union&quot;
+u:r:platform_app:s0:c512,c768  u0_a144       17888    406 14003328 177940 0                  0 S com.xxx.yyy
+</code></pre>
+<p>如果每次修改都需要先编译生成未签名应用，再使用<code>signapk.jar</code>去签名，未免太过于繁琐，其实可以使用<code>gradle</code>将这一系列操作都集成到构建脚本中，让app可以像<code>untrusted_app</code>一样直接在<code>Android Studio</code>中一键编译运行。</p>
+<h3 id="31-keystore文件生成">3.1 <code>keystore</code>文件生成</h3>
+<p>首先需要将上面使用的两个<code>platform</code>密钥生成<code>Android Studio</code>使用的<code>keystore</code>文件，使用<code>openssl</code>即可完成：</p>
+<ol>
+<li>
+<p>使用<code>pk8</code>文件生成<code>platform.priv.pem</code>文件：</p>
+<pre><code class="language-shell">openssl pkcs8 -in platform.pk8 -inform DER -outform PEM -out platform.priv.pem -nocrypt
+</code></pre>
+</li>
+<li>
+<p>使用<code>platform.x509.pem</code>和<code>platform.priv.pem</code>生成<code>platform.pk12</code>，这里会被要求指定<code>key name</code>，你可以使用任意你想用的名字，但是为了好记，强烈建议使用<code>${pkgname}_${release_type}</code>的格式。</p>
+<pre><code class="language-shell">openssl pkcs12 -export -in platform.x509.pem -inkey platform.priv.pem -out platform.pk12 -name ${key name}
+</code></pre>
+<p>当执行这条命令后，会要求输入一个密码，这个密码就是<code>key password</code>，你需要记住这个密码。</p>
+</li>
+<li>
+<p>将上面生成的<code>platform.pk12</code>存储到<code>keystore</code>文件中</p>
+<pre><code class="language-shell">keytool -importkeystore -destkeystore ${store file path} -srckeystore platform.pk12 -srcstoretype PKCS12 -srcstorepass ${key password} -alias ${key name}
+</code></pre>
+<p>其中，<code>-destkeystore</code>指定存储密钥对的<code>keystore</code>文件，如果该文件不存在，则会要求输入<code>store password</code>并创建一个新的<code>keystore</code>文件，如果该<code>keystore</code>文件已经存在，则会要求输入<code>keystore</code>文件的<code>store password</code>。</p>
+</li>
+</ol>
+<p>其实，从字面意思就可以了解<code>keystore</code>的含义，它是用来存储密钥对的。<code>keystore</code>文件具有二级密码，第一级为文件本身的密码，第二级为各密钥对的密码。可以用以下的<code>JSON</code>来理解它们的关系：</p>
+<pre><code class="language-json">{
+  &quot;keystore_name&quot;:&quot;RodneyChueng's keystore&quot;,
+  &quot;keystore_pass&quot;:&quot;123456&quot;,
+  &quot;keystore_content&quot;:[
+    {
+      &quot;key_name&quot;:&quot;com.rodneycheung.test_debug&quot;,
+      &quot;key_pass&quot;:&quot;654321&quot;,
+      &quot;key_content&quot;:&quot;asfruhsfkjhs&quot;
+    },
+    {
+      &quot;key_name&quot;:&quot;com.rodneycheung.test_release&quot;,
+      &quot;key_pass&quot;:&quot;654321&quot;,
+      &quot;key_content&quot;:&quot;jkdshfkljsfd&quot;
+    },
+    ...
+  ]
+}
+</code></pre>
+<h3 id="32-gradle脚本添加">3.2 gradle脚本添加</h3>
+<p>在<code>keystore</code>文件生成后，在<code>module</code>对应的<code>build.gradle</code>下的<code>android</code>里面使用signingConfigs添加密钥对，例如：</p>
+<pre><code class="language-groovy">android {
+    signingConfigs {
+        sunmi {
+            storeFile file('keys/sunmi/platform.jks')
+            storePassword 'android'
+            keyAlias 'androidplatformkey'
+            keyPassword 'android'
+        }
+        pixel {
+            storeFile file('keys/pixel/platform.jks')
+            storePassword 'pixelkey'
+            keyAlias 'pixel'
+            keyPassword 'pixelkey'
+        }
+    }
+    compileSdkVersion 30
+    buildToolsVersion &quot;30.0.3&quot;
+  	....
+}
+</code></pre>
+<p>可以为一个<code>module</code>添加多个不同的密钥对，密钥对的名字可以随意取，不过为了便于理解，最好为对应设备的型号，上面就添加了<code>sunmi</code>和<code>pixel</code>两个密钥对。</p>
+<p>然后同样在<code>android</code>里面的<code>buildTypes</code>中的编译配置中选择使用的密钥对，例如：</p>
+<pre><code class="language-groovy">android {
+  buildTypes {
+    debug {
+      signingConfig signingConfigs.sunmi
+    }
+  }
+}
+</code></pre>
+<p>上面的例子指定在<code>debug</code>时使用<code>sunmi</code>作为签名密钥对。</p>
+<h2 id="四-更高的system_app">四、更高的<code>system_app</code></h2>
+<p>上面已经将<code>app</code>签名为<code>platform_app</code>，但是有些时候，我们需要更高的权限来执行一些操作。例如用于查看CPU用量的<code>cat /proc/stat</code>命令，在<code>platform_app</code>下执行时会显示<code>permission denied</code>。</p>
+<p>将应用变为更高级别的<code>system_app</code>十分简单，只要在app的<code>AndroidManifest.xml</code>中的<code>manifest</code>标签中加入<code>android:sharedUserId=&quot;android.uid.system&quot;</code>即可，它的含义是允许应用与系统应用运行于同一进程中。此时，编译运行后使用<code>ps -Z</code>查看：</p>
+<pre><code class="language-shell">➜  SDKTest git:(master) ✗ adb shell &quot;ps -Z | grep union&quot;
+u:r:system_app:s0              system        23061    406 14003372 174876 0                  0 S com.xxx.yyy
+</code></pre>
+<p>发现app的权限级别已经成为了最高的<code>system_app</code>，此时执行<code>cat /proc/stat</code>会得到正确结果。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/git-fu-wu-qi-tian-jia-ssh-key/">
+                <h3 class="post-title">
+                  Git服务器添加SSH Key
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge warning">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge secondary">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge ">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge ">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge success">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge warning">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge warning">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge ">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge warning">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge ">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge warning">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge warning">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge secondary">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge success">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

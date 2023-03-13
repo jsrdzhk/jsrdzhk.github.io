@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Best practice of Python&#39;s project structure | Rodney Cheung&#39;s House🇺🇦🗽</title>
+<meta name="description" content="&lt;p&gt;I stand with Ukraine🇺🇦!&lt;/p&gt;
+&lt;p&gt;The king is noble only for practicing his way!&lt;/p&gt;
+">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://jsrdzhk.github.io/favicon.ico?v=1678701535533">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://jsrdzhk.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://jsrdzhk.github.io">Rodney Cheung&#39;s House🇺🇦🗽</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                Home
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                Archive
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                Tag
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="https://jsrdzhk.github.io/post/readme" class="menu">
+                README
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Best practice of Python&#39;s project structure</h1>
+            <p class="article-meta">
+              2021-02-19
+              
+                <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
+                  Python
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>There's no standard answer about how to structure the python's project.I'll introduce one relatively reasonable solution.Here's the example.</p>
+<pre><code>.
+├── ChangeLog
+├── README.md
+├── build.sh
+├── build_and_install_egg.sh
+├── clean_build.sh
+├── docker
+│   ├── DockerfileTemplate
+│   ├── docker-compose-template.yaml
+│   ├── env.sh
+│   └── start.sh
+├── setup.py
+├── src
+│   └── salvage
+│       ├── __init__.py
+│       ├── configuration
+│       ├── controller
+│       ├── core
+│       ├── main.py
+│       ├── model
+│       ├── repository
+│       ├── resource
+│       ├── service
+│       └── util
+└── test
+    └── salvage
+        └── configuration
+</code></pre>
+<h2 id="1chnagelog">1.Chnagelog</h2>
+<p>Changelog is very important for a project.It records the release history of the project and helps the developer find bugs quickly.Here is the recommended example of a Changelog.</p>
+<pre><code>[1.0.0]
+* first release
+
+[0.2.1]
+* fix the deadlock problem
+
+[0.2.0]
+* add multiprocessing and improve the performance
+
+[0.1.0]
+* first commit
+</code></pre>
+<p>Normally,we often use three numbers to represent the version number.The first number tracks major changes,the second tracks minor changes,the last tracks patches or bug fix.</p>
+<h2 id="2readme">2.README</h2>
+<p><code>README</code> or <code>README.md</code> is used to introduce the basic information of the project,including :</p>
+<ul>
+<li>the purpose of the project</li>
+<li>how to run the project</li>
+<li>how to develop the project</li>
+<li>introduce the structure of the code</li>
+</ul>
+<h2 id="3build-script">3.build script</h2>
+<p>Python use wheel or egg to pack the code,we can use build script to reduce the redundant typing work.Here's the example.</p>
+<pre><code class="language-sh">#!/bin/bash
+
+python3 setup.py bdist_egg bdist_wheel
+</code></pre>
+<p>We can also use a <code>clean_build.sh</code> to clean the build products.</p>
+<pre><code class="language-sh">#!/bin/sh
+
+if [ -d build ]; then
+  rm -dr build
+fi
+if [ -d dist ]; then
+  rm -dr dist
+fi
+if [ -d src/salvage.egg-info ]; then
+  rm -dr src/salvage.egg-info
+fi
+</code></pre>
+<p>You maybe want to build and install with easy install.</p>
+<pre><code class="language-sh">#!/bin/bash
+
+source build.sh
+sudo easy_install dist/salvage-*-py3.8.egg
+source clean_build.sh
+</code></pre>
+<p>Cleaning the build products is recommended because it will influence the navigate operation of some IDE.You may modify the built python code ,not the project files.<strong>Clean save your time!</strong></p>
+<h2 id="4setuppy">4.setup.py</h2>
+<p>We always use <code>setuptools</code> as the package tools.The documentation of <code>setuptools</code> is <a href="https://setuptools.readthedocs.io/en/latest/">here</a>.I'll only give some instructions about the basic usage of this tool base on one example.</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
+import os
+import setuptools
+
+def find_version(file_name):
+    with open(file_name, encoding='utf-8') as file_handle:
+        lines = file_handle.readlines()
+        latest_version = lines[0].strip(os.linesep).rstrip(']').lstrip('[')
+        print(&quot;Salvage:&quot;, latest_version)
+        return latest_version
+
+setuptools.setup(
+    name='salvage',
+    version=find_version(&quot;./ChangeLog&quot;),
+    description='toolbox',
+    long_description='operation_toolbox',
+    long_description_content_type='text/markdown',
+    # packages=['salvage'],
+    packages=setuptools.find_packages(where='src', include=['salvage*', ]),
+    package_dir={'': 'src'},
+    install_requires=[
+        'requests',
+        'pymysql',
+        'wisbec',
+        'bottle',
+        'bottle-redis',
+        'sqlalchemy',
+        'sqlalchemy_utils',
+        'tldextract',
+        'redis'
+    ],
+    package_data={
+        '': [
+            'www/*',
+            'config/*'
+        ]
+    },
+    include_package_data=True,
+    entry_points={
+        &quot;console_scripts&quot;: [
+            &quot;salvage = salvage.main:main&quot;,
+        ]
+    },
+    python_requires='&gt;=3.7,&lt;3.9',
+    platforms=['any'],
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: Unix',
+        'Operating System :: POSIX',
+        'Operating System :: Microsoft :: Windows',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Topic :: Utilities',
+    ],
+    zip_safe=False)
+</code></pre>
+<p><code>setuptools</code> use <code>setup</code> method to make the package.We just need to specify some parameters.Here's the meaning of some important arguments.</p>
+<ul>
+<li>name:the name of the project</li>
+<li>version:the version of the project ,you can specify it each time you make changes to your project.I recommend use a simple function <code>find_version</code> to read the version number from your Changelog file.You can just cpoy the function to your <code>setup.py</code> ,feel free to use it😏!</li>
+<li>description:the description of your project .</li>
+<li>long_description:similar to description ,not important.</li>
+<li>packages:this parameter is used to specify which Python packages you want to pack.Usually ,we use <code>setuptools.find_packages</code> to find the Python packages.<code>where</code> means the package location ,<code>include</code> means package name .You can use the shell blob to represent your Python package name.Here the <code>salvage*</code> means all the Python packages which has <code>salvage</code> as the prefix .For example ,<code>salvagecore</code> and so on.You can also use <code>exclude</code> to exclude some Python packages which you do not want to include in the package.</li>
+<li>package_dir :the <code>:</code> in the example means root directory ,<code>src</code> means the Python package dir.</li>
+<li>install_requires:the dependency of the project.<code>easy_install</code> and <code>pip</code> will automatically install these packges you specifed .</li>
+<li>package_data:the resource file you want to pack .Sometimes you need to add some non-python file in your package.The <code>''</code> in the example means root directory.**Attention,these means the package root.<code>setuptools</code> will look up in all of your target packages' directories.Here is the files in <code>src</code> :<pre><code>.
+└── salvage
+    ├── __init__.py
+    ├── main.py
+    ├── resource
+    │   ├── __init__.py
+    │   ├── config
+    │   │   ├── dev.ini
+    │   │   └── release.ini
+    │   ├── runtime.py
+    │   └── www
+    │       ├── adb.bundle.js
+    │       └── index.html
+    └── util
+        └── __init__.py
+</code></pre>
+the <code>www/*</code> means pack all files in <code>www</code> directory ,so <code>adb.bundle.js</code> and <code>index.html</code> will be include in the package.</li>
+<li>include_package_data:if this parameter is <code>True</code> ,the <code>package_data</code> make sense .</li>
+<li>entry_points:this argument specify the entry point of your package.<code>console_scripts</code> means you can run the code from console after you installed the package.<code>salvage = salvage.main:main</code> means the console script name is <code>salvage</code> and the script entry point is the <code>main</code> function in salvage package's <code>main.py</code> file.Python will generate a script file on the <code>PATH</code> ,which is usually <code>/usr/local/bin</code>.</li>
+<li>python_requires:this stipulated the ranges the Python version of your packages.<code>&gt;=3.7,&lt;3.9</code> means you can use this package with Python 3.7/3.8/3.9.</li>
+<li>platform:this means the platform of your package ,<code>any</code> means all platform is compatible .</li>
+</ul>
+<h2 id="5code-structure">5.code structure</h2>
+<p>I recommend use <code>src</code> to place all of your code and <code>test</code> to place your test code.You can also use the project name to replace <code>src</code>.</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                Next Blog
+              </div>
+              <a href="https://jsrdzhk.github.io/post/xie-gei-kai-fa-zhe-kotlin-zhi-yin-er/">
+                <h3 class="post-title">
+                  写给开发者Kotlin指引（二）
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://jsrdzhk.github.io/images/avatar.png?v=1678701535533" class="no-responsive avatar">
+    <div class="text-muted"><p>I stand with Ukraine🇺🇦!</p>
+<p>The king is noble only for practicing his way!</p>
+</div>
+    <div class="social-container">
+      
+        
+          <a href="https://github.com/jsrdzhk" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+          <a href="https://twitter.com/jsrdzhk" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Latest Blog
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-fen-cha-zhao/">二分查找</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/li-jie-czhong-de-zuo-zhi-he-you-zhi/">理解C++中的左值和右值</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/jian-dan-de-shared_ptr-shi-xian/">简单的shared_ptr实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/lian-biao-xiang-guan/">链表相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/tu-xiang-guan/">图相关</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-sou-suo-shu-bst/">二叉搜索树（BST）</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/git-ji-chu-yi/">Git基础(一)</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-image-import-and-export/">Docker镜像导入导出</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/docker-installation/">Docker安装</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://jsrdzhk.github.io/post/er-cha-shu/">二叉树</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      Tag List
+    </div>
+    <div class="row">
+      
+        <a href="https://jsrdzhk.github.io/tag/weUBFlLDD/" class="badge success">
+          binary search
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/MGd4HYSuo/" class="badge warning">
+          cpp
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/KKjUQ4MWe/" class="badge success">
+          Smart Pointers
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ej_j7SeTH/" class="badge ">
+          LinkedList
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/_ydDLNY97/" class="badge warning">
+          data structure
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/84fw4eg0Y/" class="badge secondary">
+          Graph
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/0q-BX870D/" class="badge ">
+          BST
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/s7a4AhfBW/" class="badge success">
+          tree
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/J6bMD7YjK/" class="badge ">
+          Git
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/-i04JmKge/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/pX3bayx0K/" class="badge success">
+          proxy
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/JtKSwj9dO/" class="badge ">
+          Android
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/ZheDh5Fg9/" class="badge warning">
+          Kotlin
+        </a>
+      
+        <a href="https://jsrdzhk.github.io/tag/7Fzphc59o/" class="badge secondary">
+          Python
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://jsrdzhk.github.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>
